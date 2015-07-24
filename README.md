@@ -1,0 +1,2 @@
+# Curriculum-ViTeX
+Curriculum ViTeX is a small application that will generate TeX files for your resume/CV in different templates, with you only having to maintain one master RML file ("Resume Markup Language" - an XML file which follows specific standards). C-ViTeX is extensible in that you may feel free to add your own sty/cls files in addition to the ones supplied. Currently a huge work in progress.
