@@ -16,9 +16,9 @@ class PhoneNumber:
         self.lastFour = num[6:]
 
 class School:
-    def __init__(self):
-        self.beg = ""
-        self.end = ""
+    def __init__(self, b="", e=""):
+        self.beg = b
+        self.end = e
         self.name = ""
         self.majors = []
         self.degrees = []
