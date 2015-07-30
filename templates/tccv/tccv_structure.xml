@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<structure>
+  <packages>
+    <package>
+      <option>english</option>
+      <value>babel</value>
+    </package>
+  </packages>
+
+  <document>
+    <command label="part" args="1">
+      <argument><property category="personal" content="name" /></argument>
+    </command>
+    <command label="section" args="1">
+      <argument>Work Experience</argument>
+    </command>
+    <environment label="eventlist">
+      <iteration category="experiences">
+	<command label="item" args="3">
+	  <argument>
+	    <property category="experience" content="duration" />
+	  </argument>
+	  <argument>
+	    <property category="experience" content="employer" />
+	  </argument>
+	  <argument>
+	    <property category="experience" content="title" />
+	  </argument>
+	</command>
+	<text>
+	  <property category="experience" content="desription" />
+	</text>
+      </iteration>
+    </environment>
+
+    <command label="personal" args="3">
+      <option><property category="personal" content="website" /></option>
+      <argument><property category="personal" content="address" /></argument>
+      <argument><property category="personal" content="phone" /></argument>
+      <argument><property category="personal" content="email" /></argument>
+    </command>
+    
+    <command label="section" args="1">
+      <argument>Education</argument>
+    </command>
+    <environment label="yearlist">
+      <iteration category="education">
+	<command label="item" args="3">
+	  <option>
+	    GPA: <property category="school" content="gpa" />
+	  </option>
+	  <argument>
+	    <property category="school" content="beginning" />
+	    <property category="school" content="end" />
+	  </argument>
+	  <argument>
+	    <property category="school" content="name" />
+	  </argument>
+	  <argument>
+	    <property category="school" content="degrees" />
+	  </argument>
+	</command>
+      </iteration>
+    </environment>
+
+    <command label="section" args="1">
+      <argument>Relevant Coursework</argument>
+    </command>
+    <environment label="factlist">
+      <iteration category = "courses">
+	<command label="item" args="2">
+	  <argument></argument>
+	  <argument>
+	    <property category="courses" content = "course"/>
+	  </argument>
+	</command>
+      </iteration>
+    </environment>
+  </document>
+</structure>
