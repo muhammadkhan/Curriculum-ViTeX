@@ -134,7 +134,3 @@ class RMLParser:
             else:
                 raise badrml("<" + child.tag + "> is not a valid child for <personal>")
         return personal
-
-if __name__ == "__main__":
-    parsed = RMLParser(sys.argv[1])
-    print("Success!")
