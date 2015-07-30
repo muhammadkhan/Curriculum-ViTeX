@@ -1,6 +1,7 @@
+import sys
 import xml.etree.ElementTree as ET
 from resume import *
-from rmlexceptions import InvalidRMLFileException
+from rmlexceptions import InvalidRMLFileException as badrml
 
 class RMLParser:
     def __init__(self, rmlFilePath):
@@ -16,24 +17,59 @@ class RMLParser:
             #                        <courses>
             #                        <experiences>
             if(child.tag == "personal"):
-                resm.personal = loadPersonal(child)
+                resm.personal = self.loadPersonal(child)
             elif(child.tag == "education"):
-                resm.education = loadEducation(child)
+                resm.education = self.loadEducation(child)
             elif(child.tag == "courses"):
-                pass
+                resm.courses = self.loadCourses(child)
             elif(child.tag == "experiences"):
-                pass
+                resm.experiences = self.loadExperiences(child)
             else:
                 raise badrml("<" + child.tag + "> is not a valid descendant of <resume>")
 
+        self.res = resm
+
+    def loadExperiences(self, experiencesNode):
+        experiences = []
+
+        for experNode in experiencesNode:
+            if(experNode.tag != "experience"):
+                raise badrml("only <experience> allowed")
+            experience = Experience()
+            fields = {
+                "title" : experience.title,
+                "employer" : experience.employer,
+                "duration" : experience.duration,
+                "description" : experience.desc
+            }
+            for child in experNode:
+                #possibilities for child:
+                #                       <title>
+                #                       <employer>
+                #                       <duration>
+                #                       <description>
+                if(child.tag in fields.keys()):
+                    fields[child.tag] = child.text
+        
+        return experiences
+
+    def loadCourses(self, coursesNode):
+        courses = []
+        for i in range(0,len(coursesNode)):
+            course = coursesNode[i]
+            if(course.tag != "course"):
+                raise badrml("only <course> allowed")
+            courses.append(course.text)
+        return courses
+
     def loadEducation(self, educationNode):
         education = []
-        for(schoolNode in educationNode):
+        for schoolNode in educationNode:
             if(schoolNode.tag != "school"):
                 raise badrml("<school> is the only valid child for <education>")
-            schoolDict = schoolNode.attr
+            schoolDict = schoolNode.attrib
             school = School(schoolDict["beginning"], schoolDict["end"])
-            for(child in schoolNode):
+            for child in schoolNode:
                 #possibilites for child:
                 #                      <name>
                 #                      <majors>
@@ -57,7 +93,7 @@ class RMLParser:
                         degrees.append(child[i].text)
                     school.degrees = degrees
                 elif(child.tag == "gpa"):
-                    gpaInfo = gpa.attr
+                    gpaInfo = child.attrib
                     school.gpaActual = float(gpaInfo["value"])
                     school.gpaMax = float(gpaInfo["maximum"])
                 elif(child.tag == "comment"):
@@ -67,7 +103,7 @@ class RMLParser:
 
     def loadPersonal(self, personalNode):
         personal = Personal()
-        for(child in personalNode):
+        for child in personalNode:
             #possibilities for child:
             #                       <name>
             #                       <phone>
@@ -79,7 +115,7 @@ class RMLParser:
             elif(child.tag == "phone"):
                 ext = ""
                 #phone number validation
-                extSplit = child.tag.lower().split("x")
+                extSplit = child.text.lower().split("x")
                 if(len(extSplit) > 2):
                     raise badrml("phone numbers must have at most 1 extension")
                 elif(len(extSplit) == 2):
@@ -98,3 +134,7 @@ class RMLParser:
             else:
                 raise badrml("<" + child.tag + "> is not a valid child for <personal>")
         return personal
+
+if __name__ == "__main__":
+    parsed = RMLParser(sys.argv[1])
+    print("Success!")
