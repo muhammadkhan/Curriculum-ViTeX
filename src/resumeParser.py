@@ -1,6 +1,6 @@
 import xml.etree.ElementTree as ET
-from resume import *
-from cvitexexceptions import InvalidRMLFileException as badrml
+from src.resume import *
+from src.cvitexexceptions import InvalidRMLFileException as badrml
 
 class RMLParser:
     def __init__(self, rmlFilePath):

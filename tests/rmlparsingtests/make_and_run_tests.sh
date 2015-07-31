@@ -5,8 +5,10 @@
 #        will take <x.rml> and create <text_x.py>
 #        will then run each .py file
 
+#idk if it's poor style to write entire files using shell
+
 import1="from src.resumeParser import RMLParser as rmlp"
-import2="from src.cvitexexceptions import InvalidRMLException as badrml"
+import2="from src.cvitexexceptions import InvalidRMLFileException as badrml"
 import3="import sys"
 
 if [ $# -ge 1 ]; then
@@ -21,7 +23,7 @@ else
 	echo $import3 >> $file
 	echo "if __name__ == \"__main__\":" >> $file
 	echo "  try:" >> $file
-	echo "    parsed = rmlp(${rmlFile})" >> $file
+	echo "    parsed = rmlp(\"${rmlFile}\")" >> $file
 	echo "    print(\"test success!\")" >> $file
 	echo "  except badrml:" >> $file
 	echo "    e = sys.exc_info()[0]" >> $file
