@@ -49,7 +49,9 @@ class RMLParser:
                 #                       <description>
                 if(child.tag in fields.keys()):
                     fields[child.tag] = child.text
-        
+                else:
+                    raise badrml("<experience> can only take so much")
+                    
         return experiences
 
     def loadCourses(self, coursesNode):
