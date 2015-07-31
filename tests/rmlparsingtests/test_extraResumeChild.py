@@ -1,6 +1,8 @@
+import sys
+from os.path import pardir, sep
+sys.path.append(pardir + sep + pardir + sep)
 from src.resumeParser import RMLParser as rmlp
 from src.cvitexexceptions import InvalidRMLFileException as badrml
-import sys
 if __name__ == "__main__":
   try:
     parsed = rmlp("extraResumeChild.rml")

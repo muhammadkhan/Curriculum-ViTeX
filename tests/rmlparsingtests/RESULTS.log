@@ -1,0 +1,84 @@
+#############################
+TEST: test_extraCoursesChild.py
+#############################
+exception caught: <class 'src.cvitexexceptions.InvalidRMLFileException'>
+
+
+#############################
+TEST: test_extraDegreesChild.py
+#############################
+exception caught: <class 'src.cvitexexceptions.InvalidRMLFileException'>
+
+
+#############################
+TEST: test_extraEducationChild.py
+#############################
+exception caught: <class 'src.cvitexexceptions.InvalidRMLFileException'>
+
+
+#############################
+TEST: test_extraExperienceChild.py
+#############################
+exception caught: <class 'src.cvitexexceptions.InvalidRMLFileException'>
+
+
+#############################
+TEST: test_extraExperiencesChild.py
+#############################
+exception caught: <class 'src.cvitexexceptions.InvalidRMLFileException'>
+
+
+#############################
+TEST: test_extraMajorsChild.py
+#############################
+exception caught: <class 'src.cvitexexceptions.InvalidRMLFileException'>
+
+
+#############################
+TEST: test_extraResumeChild.py
+#############################
+exception caught: <class 'src.cvitexexceptions.InvalidRMLFileException'>
+
+
+#############################
+TEST: test_extraSchoolChild.py
+#############################
+exception caught: <class 'src.cvitexexceptions.InvalidRMLFileException'>
+
+
+#############################
+TEST: test_gpaMissingAttr.py
+#############################
+exception caught: <class 'src.cvitexexceptions.InvalidRMLFileException'>
+
+
+#############################
+TEST: test_improperRoot.py
+#############################
+exception caught: <class 'src.cvitexexceptions.InvalidRMLFileException'>
+
+
+#############################
+TEST: test_phoneNotTen.py
+#############################
+exception caught: <class 'src.cvitexexceptions.InvalidRMLFileException'>
+
+
+#############################
+TEST: test_phoneTwoExts.py
+#############################
+exception caught: <class 'src.cvitexexceptions.InvalidRMLFileException'>
+
+
+#############################
+TEST: test_schoolMissingAttr.py
+#############################
+exception caught: <class 'src.cvitexexceptions.InvalidRMLFileException'>
+
+
+#############################
+TEST: test_totallyValid.py
+#############################
+test success!
+
+
