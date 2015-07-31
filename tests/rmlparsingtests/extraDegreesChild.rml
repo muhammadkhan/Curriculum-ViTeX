@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<resume>
+  <personal>
+    <name>Name</name>
+    <phone>1234567890</phone>
+    <email>email@site.com</email>
+    <address>Box on the street</address>
+    <website>site.com</website>
+  </personal>
+
+  <education>
+    <school beginning="0" end="100">
+      <majors>
+	<major>Underwater Basket Weaving</major>
+      </majors>
+      <degrees>
+	<degree>Didn't land in jail</degree>
+	<alligotwas>a piece of paper</alligotwas>
+      </degrees>
+    </school>
+  </education>
+</resume>

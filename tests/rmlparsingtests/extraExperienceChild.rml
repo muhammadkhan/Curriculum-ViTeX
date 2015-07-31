@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<resume>
+  <personal>
+    <name>Name</name>
+    <phone>1234567890</phone>
+    <email>email@site.com</email>
+    <address>Box on the street</address>
+    <website>site.com</website>
+  </personal>
+
+  <education>
+    <school beginning="0" end="100">
+      <name>Break University</name>
+      <majors><major>Art</major></majors>
+      <degrees><degree>BA</degree></degrees>
+      <gpa value="5.8" maximum="0.4"/>
+      <comment>Didn't learn much</comment>
+    </school>
+  </education>
+
+  <courses>
+    <course>sleeping</course>
+  </courses>
+
+  <experiences>
+    <experience>
+      <stillhavenot>accomplished much</stillhavenot>
+    </experience>
+  </experiences>
+</resume>

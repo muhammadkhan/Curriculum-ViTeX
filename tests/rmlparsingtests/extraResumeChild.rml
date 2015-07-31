@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<resume>
+  <extrachild>Should raise exception</extrachild>
+  <personal>this won't work</personal>
+  <nothing>else to write</nothing>
+</resume>
