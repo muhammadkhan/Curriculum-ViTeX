@@ -96,8 +96,11 @@ class RMLParser:
                     school.degrees = degrees
                 elif(child.tag == "gpa"):
                     gpaInfo = child.attrib
-                    school.gpaActual = float(gpaInfo["value"])
-                    school.gpaMax = float(gpaInfo["maximum"])
+                    try:
+                        school.gpaActual = float(gpaInfo["value"])
+                        school.gpaMax = float(gpaInfo["maximum"])
+                    except KeyError:
+                        raise badrml("missing gpa attributes")
                 elif(child.tag == "comment"):
                     school.comment = child.text
                 else:
