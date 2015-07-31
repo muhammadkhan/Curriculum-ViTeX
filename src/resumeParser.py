@@ -67,7 +67,10 @@ class RMLParser:
             if(schoolNode.tag != "school"):
                 raise badrml("<school> is the only valid child for <education>")
             schoolDict = schoolNode.attrib
-            school = School(schoolDict["beginning"], schoolDict["end"])
+            try:
+                school = School(schoolDict["beginning"], schoolDict["end"])
+            except KeyError:
+                raise badrml("<school> missing beginning and end attributes")
             for child in schoolNode:
                 #possibilites for child:
                 #                      <name>
