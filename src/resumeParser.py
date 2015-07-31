@@ -100,6 +100,8 @@ class RMLParser:
                     school.gpaMax = float(gpaInfo["maximum"])
                 elif(child.tag == "comment"):
                     school.comment = child.text
+                else:
+                    raise badrml("some invalid school children")
             education.append(school)
         return education
 
