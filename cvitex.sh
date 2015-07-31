@@ -10,5 +10,5 @@
 if [ $# -lt 1 ]; then
     echo ERROR: Insufficient number of arguments
 else
-    python vitex.py $@
+    python src/vitex.py $@
 fi
