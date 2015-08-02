@@ -5,6 +5,14 @@ from texdocument import *
 
 SUFFIX = "_structure.xml"
 
+def getEntireText(node):
+    """
+    Used to get the entire text for element [node]
+    Example: if t refers to '<tag>1234<tag2>56</tag2>7890</tag>'
+             then getEntireText(t) = '1234<tag2>56</tag2>7890'
+    """
+    return "".join([node.text] + [ET.tostring(child) for child in node.getchildren()])
+
 def genTexFilePath(sxmlFilePath):
     """Assuming that the XML file name
        is of the format <*>_structure.xml, will generate the
@@ -18,6 +26,7 @@ def genTexFilePath(sxmlFilePath):
 
 class StructureXMLParser:
     def __init__(self, resumeObj, sxmlFilePath):
+        self.resumeObj = resumeObj
         xmlTree = ET.parse(sxmlFilePath)
         structureTag = xmlTree.getroot()
         texdoc = TeXStructure(genTexFilePath(sxmlFilePath))
@@ -28,15 +37,15 @@ class StructureXMLParser:
             #                      <packages>
             #                      <document>
             if(child.tag == "packages"):
-                texdoc.packages = loadPackages(child, resumeObj)
+                texdoc.packages = loadPackages(child)
             elif(child.tag == "document"):
-                texdoc.documentBody = loadBody(child, resumeObj)
+                texdoc.documentBody = loadBody(child)
             else:
                 raise badxml("<" + child.tag + "> is not a valid direct child of <structure>")
 
         return texdoc
 
-    def loadPackages(self, packagesNode, resumeObj):
+    def loadPackages(self, packagesNode):
         packages = []
         for packageNode in packagesNode:
             if packageNode.tag != "package":
@@ -51,5 +60,50 @@ class StructureXMLParser:
             packages.append(packageTuple)
         return packages
 
-    def loadBody(self, documentNode, resumeObj):
-        pass
+    def loadBody(self, documentNode):
+        body = None
+        commands = []
+        for child in documentNode:
+            #possibilities for child:
+            #                       <command>
+            #                       <environment>
+            #                       <iteration>
+            #                       <text>
+            if child.tag == "command":
+                commands.append(self.parseCommand(child))
+            elif child.tag == "environment":
+                pass
+            elif child.tag == "iteration":
+                pass
+            elif child.tag == "text":
+                pass
+            else:
+                raise badxml("<" + child.tag + "> not a valid descendant of <document>")
+        return body
+
+    def parseCommand(self, commandNode):
+        #a <command> can only contain <argument>
+        commandNodeInfo = commandNode.attrib
+        try:
+            if len(commandNode) != int(commandNodeInfo["args"]):
+                raise badxml("number of <argument> tags not equal to value in 'args'")
+            elif int(commandNodeInfo["args"]) < 0:
+                raise badxml("cannot have negative 'args' value in <command>")
+        except ValueError:
+            raise badxml("<command> was not given a numerical value for 'args'")
+        except KeyError:
+            raise badxml("<command> was not supplied any 'args'")
+
+        arguments = []
+        for argument in commandNode:
+            if argument.tag != "argument":
+                raise badxml("<command> can only contain <argument> tags")
+            if len(argument) == 0: #aka pure text, no tags inside
+                arguments.append(argument.text)
+            else:
+                for child in argument:
+                    #possibilities for child:
+                    #                       <command>
+                    #                       <property>
+                    #TODO this
+                    pass
