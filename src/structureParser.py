@@ -81,7 +81,7 @@ class StructureXMLParser:
                 raise badxml("<" + child.tag + "> not a valid descendant of <document>")
         return body
 
-    def parseCommand(self, commandNode):
+    def parseCommand(self, commandNode, iterationNode=None):
         #a <command> can only contain <argument>
         commandNodeInfo = commandNode.attrib
         try:
@@ -118,7 +118,14 @@ class StructureXMLParser:
                         #recursion ftw
                         arguments.extend(self.parseCommand(child))
                     elif child.tag == "property":
-                        pass
+                        if iterationNode is None:
+                            arguments.append(self.loadProperty(child))
+                        else:
+                            try:
+                                iterCat = iterationNode.attrib["category"]
+                                arguments.append(self.loadProperty(child, iterCat))
+                            except KeyError:
+                                raise badxml("<iteration> needs 'category'")
                     else:
                         raise badxml("<" + child.tag + "> is not a valid child for <argument>")
 
@@ -130,7 +137,7 @@ class StructureXMLParser:
         except KeyError:
             raise badxml("<command> is missing a label")
 
-    def loadProperty(self, propertyNode):
+    def loadProperty(self, propertyNode, iterationSection=None):
         if len(propertyNode) > 0 or propertyNode.text is not None or propertyNode.tail is not None:
             raise badxml("poorly formatted <property> - cannot have children or encapsulate any text")
         resumeSection = ""
@@ -141,11 +148,11 @@ class StructureXMLParser:
             sectionField = info["content"]
         except KeyError:
             raise badxml("<property /> must have both 'category' and 'content'")
-        #Possibilities for resumeSection:
-        #                               "personal"
-        #                               "education"
-        #                               "courses"
-        #                               "experiences"
-        try:
-            section = getattr(self.resumeObj, resumeSection)
-            
+        #possibilities of parent:
+        #                       the resume object itself
+        #                       the education object, containing schools
+        #                       the courses object, containing courses
+        #                       the experiences obj, containing exp's
+        parent = getattr(self.resumeObj, iterationSection) if iterationSection is not None else self.resumeObj
+        categoryClassification = getattr(parent, resumeSection)
+        return str(getattr(categoryClassification, sectionField))
