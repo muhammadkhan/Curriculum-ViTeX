@@ -129,3 +129,23 @@ class StructureXMLParser:
             return LaTeXCommand(commandNodeInfo["label"], arguments)
         except KeyError:
             raise badxml("<command> is missing a label")
+
+    def loadProperty(self, propertyNode):
+        if len(propertyNode) > 0 or propertyNode.text is not None or propertyNode.tail is not None:
+            raise badxml("poorly formatted <property> - cannot have children or encapsulate any text")
+        resumeSection = ""
+        resumeField = ""
+        try:
+            info = propertyNode.attrib
+            resumeSection = info["category"]
+            sectionField = info["content"]
+        except KeyError:
+            raise badxml("<property /> must have both 'category' and 'content'")
+        #Possibilities for resumeSection:
+        #                               "personal"
+        #                               "education"
+        #                               "courses"
+        #                               "experiences"
+        try:
+            section = getattr(self.resumeObj, resumeSection)
+            
