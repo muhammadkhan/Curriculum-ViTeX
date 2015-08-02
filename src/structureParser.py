@@ -99,11 +99,33 @@ class StructureXMLParser:
             if argument.tag != "argument":
                 raise badxml("<command> can only contain <argument> tags")
             if len(argument) == 0: #aka pure text, no tags inside
-                arguments.append(argument.text)
+                if argument.text is not None:
+                    arguments.append(argument.text)
+                else:
+                    raise badxml("can't have empty <argument></argument>")
             else:
+                #WATCH OUT FOR: there may be text and children tags coupled randomly
+                #    like - <argument>
+                #              text text <command ...>...</command> more text <property... /> text
+                #           </argument>
+                if argument.text is not None:
+                    arguments.append(argument.text)
                 for child in argument:
                     #possibilities for child:
                     #                       <command>
                     #                       <property>
-                    #TODO this
-                    pass
+                    if child.tag == "command":
+                        #recursion ftw
+                        arguments.extend(self.parseCommand(child))
+                    elif child.tag == "property":
+                        pass
+                    else:
+                        raise badxml("<" + child.tag + "> is not a valid child for <argument>")
+
+                    if child.tail is not None:
+                        arguments.append(child.tail)
+                        
+        try:
+            return LaTeXCommand(commandNodeInfo["label"], arguments)
+        except KeyError:
+            raise badxml("<command> is missing a label")
