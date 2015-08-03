@@ -25,6 +25,12 @@ class LaTeXCommand:
         self.option = option
         self.contents = contents
 
+class Environment:
+    def __init__(self, name, option = "", cmds_and_envs):
+        self.name = name
+        self.option = option
+        self.cmds_and_envs = cmds_and_envs
+
 class Body:
     
 
