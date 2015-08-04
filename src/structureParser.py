@@ -37,20 +37,20 @@ class StructureXMLParser:
             #                      <packages>
             #                      <document>
             if(child.tag == "packages"):
-                texdoc.packages = loadPackages(child)
+                texdoc.packages = self.loadPackages(child)
             elif(child.tag == "document"):
-                texdoc.documentBody = loadBody(child)
+                texdoc.documentBody = self.loadBody(child)
             else:
                 raise badxml("<" + child.tag + "> is not a valid direct child of <structure>")
 
-        return texdoc
+        self.texdoc = texdoc
 
     def loadPackages(self, packagesNode):
         packages = []
         for packageNode in packagesNode:
             if packageNode.tag != "package":
                 raise badxml("only <package> allowed")
-            if len(packageNode != 2):
+            if len(packageNode) != 2:
                 raise badxml("<package> can only have 2 children")
             packageTuple = None
             if packageNode[0] == "option" and packageNode[1] == "value":
@@ -161,7 +161,10 @@ class StructureXMLParser:
                         arguments.append(child.tail)
                         
         try:
-            return LaTeXCommand(commandNodeInfo["label"], arguments)
+            cmd = LaTeXCommand(commandNodeInfo["label"], arguments)
+            if option is not None:
+                cmd.option = option
+            return cmd
         except KeyError:
             raise badxml("<command> is missing a label")
 
