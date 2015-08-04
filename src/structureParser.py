@@ -140,14 +140,12 @@ class StructureXMLParser:
             if len(argument) == 0: #aka pure text, no tags inside
                 if argument.text is not None:
                     arguments.append(argument.text)
-                # else:
-                #     raise badxml("can't have empty <argument></argument>")
             else:
                 #WATCH OUT FOR: there may be text and children tags coupled randomly
                 #    like - <argument>
                 #              text text <command ...>...</command> more text <property... /> text
                 #           </argument>
-                if argument.text is not None:
+                if argument.text is not None and len(argument.text.strip()) > 0:
                     arguments.append(argument.text)
                 for child in argument:
                     #possibilities for child:
@@ -161,7 +159,7 @@ class StructureXMLParser:
                     else:
                         raise badxml("<" + child.tag + "> is not a valid child for <argument>")
 
-                    if child.tail is not None:
+                    if child.tail is not None and len(child.tail.strip()) > 0:
                         arguments.append(child.tail)
                         
         try:
@@ -188,7 +186,6 @@ class StructureXMLParser:
         #                       the education object, containing schools
         #                       the courses object, containing courses
         #                       the experiences obj, containing exp's
-        parent = None
         categoryClassification = None
         if iterationSection is not None:
             if type(iterationSection) is not str:
@@ -198,11 +195,10 @@ class StructureXMLParser:
             #categoryClassification = getattr(parent[iterationIndex], resumeSection)
             categoryClassification = parent[iterationIndex]
         else:
-            parent = self.resumeObj
-            #parent would be an object
-            categoryClassification = getattr(parent, resumeSection)
+            categoryClassification = getattr(self.resumeObj, resumeSection)
         try:
-            return str(getattr(categoryClassification, sectionField))
+            r = str(getattr(categoryClassification, sectionField))
+            return r
         except AttributeError: return str(categoryClassification)
 
     def parseOption(self, optionNode, iterationSection=None):
@@ -215,18 +211,19 @@ class StructureXMLParser:
                 s += self.loadProperty(child, iterationSection)
                 if child.tail is not None:
                     s += child.tail
+                print(s)
             else:
                 raise badxml("<option> can only have <property>")
 
     def parseIteration(self, iterationNode):
         section = None
-        iterInfo = iterationNode.attrib
+        iterationSection = self.getIterCat(iterationNode)
         try:
-            section = getattr(self.resumeObj, iterInfo["category"])
+            section = getattr(self.resumeObj, iterationSection)
         except KeyError:
             raise badxml("<iteration> missing a category")
         except AttributeError:
-            raise badxml("\"" + iterInfo["category"] + "\" does not correspond to an appropriate iterable")
+            raise badxml("\"" + iterationSection + "\" does not correspond to an appropriate iterable")
         iterContents = []
         for i in range(0, len(section)):
             if iterationNode.text is not None:
@@ -235,7 +232,6 @@ class StructureXMLParser:
                 #possibilities for child:
                 #                       <command>
                 #                       <property />
-                iterationSection = self.getIterCat(iterationNode)
                 if child.tag == "command":
                     iterContents.append(self.parseCommand(child, iterationNode, i))
                 elif child.tag == "property":

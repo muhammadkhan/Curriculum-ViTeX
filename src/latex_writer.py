@@ -20,7 +20,9 @@ def packageStr(packageTuple):
 
 def commandStr(cmd):
     c = "\\" + cmd.name
-    c += "[" + cmd.option + "]" if len(cmd.option) > 0 else ""
+    if len(cmd.option) > 0:
+        c += "[" + cmd.option + "]"
+
     for x in cmd.contents:
         c += "{" + x + "}"
     return c
