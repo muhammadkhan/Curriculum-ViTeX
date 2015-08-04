@@ -49,13 +49,18 @@ class StructureXMLParser:
         for packageNode in packagesNode:
             if packageNode.tag != "package":
                 raise badxml("only <package> allowed")
-            if len(packageNode) != 2:
-                raise badxml("<package> can only have 2 children")
+            if len(packageNode) > 2:
+                raise badxml("<package> can have at most 2 children")
             packageTuple = None
-            if packageNode[0] == "option" and packageNode[1] == "value":
-                packageTuple = (packageNode[0].text, packageNode[1].text)
-            else:
-                packageTuple = (packageNode[1].text, packageNode[0].text)
+            try:
+                if packageNode[0] == "option" and packageNode[1] == "value":
+                    packageTuple = (packageNode[1].text, packageNode[0].text)
+                elif packageNode[1] == "option" and packageNode[0] == "value":
+                    packageTuple = (packageNode[0].text, packageNode[1].text)
+                else:
+                    raise badxml("<package> must have one of each <option> and <value>")
+            except IndexError:
+                packageTuple = (packageNode[0],)
             packages.append(packageTuple)
         return packages
 
