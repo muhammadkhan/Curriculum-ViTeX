@@ -5,14 +5,6 @@ from texdocument import *
 
 SUFFIX = "_structure.xml"
 
-def getEntireText(node):
-    """
-    Used to get the entire text for element [node]
-    Example: if t refers to '<tag>1234<tag2>56</tag2>7890</tag>'
-             then getEntireText(t) = '1234<tag2>56</tag2>7890'
-    """
-    return "".join([node.text] + [ET.tostring(child) for child in node.getchildren()])
-
 def genTexFilePath(sxmlFilePath):
     """Assuming that the XML file name
        is of the format <*>_structure.xml, will generate the
