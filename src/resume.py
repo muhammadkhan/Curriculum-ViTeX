@@ -17,13 +17,12 @@ class PhoneNumber:
 
 class School:
     def __init__(self, b="", e=""):
-        self.beg = b
+        self.beginning = b
         self.end = e
         self.name = ""
         self.majors = []
         self.degrees = []
-        self.gpaActual = 0.0
-        self.gpaMax = 0.0
+        self.gpa = None
         self.comment = ""
 
 class Experience:

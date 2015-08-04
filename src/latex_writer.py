@@ -58,6 +58,6 @@ def writeLaTeX(texdoc, cls):
             elif type(content) is str:
                 texfile.write(content + "\n")
             elif type(content) is Environment:
-                envrionmentWrite(texfile, content)
+                environmentWrite(texfile, content)
         
         texfile.write("\\end{document}")

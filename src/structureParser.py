@@ -24,6 +24,15 @@ def genTexFilePath(sxmlFilePath):
     prefix = sxmlFilePath[:-len(SUFFIX)]
     return prefix + "_cv.tex"
 
+
+def valid_num_argument_tags(commandNode):
+    expected_value = int(commandNode.attrib["args"])
+    ct = 0
+    for child in commandNode:
+        if child.tag == "argument":
+            ct += 1
+    return ct == expected_value
+
 class StructureXMLParser:
     def __init__(self, resumeObj, sxmlFilePath):
         self.resumeObj = resumeObj
@@ -82,11 +91,11 @@ class StructureXMLParser:
             #                       <iteration>
             #                       <property />
             if child.tag in parse_routines.keys():
-                res = parse_routines[child.tag]
+                r = parse_routines[child.tag]
                 try:
-                    cmds_and_envs.append(res)
+                    cmds_and_envs.append(r(child))
                 except TypeError:
-                    cmds_and_envs.extend(res)
+                    cmds_and_envs.extend(r(child))
             else:
                 raise badxml("<" + child.tag + "> is not a valid descendant of <document>")
                     
@@ -113,17 +122,16 @@ class StructureXMLParser:
         try:
             return iterationNode.attrib["category"]
         except KeyError:
-            raise badxml("<iteration> needs 'category'")        
+            raise badxml("<iteration> needs 'category'")
 
     def parseCommand(self, commandNode, iterationNode=None, iterationIndex = -1):
         #a <command> can only contain <argument>
         #or an <option>
-        commandNodeInfo = commandNode.attrib
         option = None
         try:
-            if len(commandNode) != int(commandNodeInfo["args"]):
+            if not valid_num_argument_tags(commandNode):
                 raise badxml("number of <argument> tags not equal to value in 'args'")
-            elif int(commandNodeInfo["args"]) < 0:
+            elif int(commandNode.attrib["args"]) < 0:
                 raise badxml("cannot have negative 'args' value in <command>")
         except ValueError:
             raise badxml("<command> was not given a numerical value for 'args'")
@@ -133,15 +141,15 @@ class StructureXMLParser:
         arguments = []
         for argument in commandNode:
             if argument.tag == "option":
-                option = self.parseOption(argument, getIterCat(iterationNode))
+                option = self.parseOption(argument, self.getIterCat(iterationNode))
                 continue
             elif argument.tag != "argument":
                 raise badxml("<command> can only contain <argument> tags")
             if len(argument) == 0: #aka pure text, no tags inside
                 if argument.text is not None:
                     arguments.append(argument.text)
-                else:
-                    raise badxml("can't have empty <argument></argument>")
+                # else:
+                #     raise badxml("can't have empty <argument></argument>")
             else:
                 #WATCH OUT FOR: there may be text and children tags coupled randomly
                 #    like - <argument>
@@ -157,7 +165,7 @@ class StructureXMLParser:
                         #recursion ftw
                         arguments.extend(self.parseCommand(child))
                     elif child.tag == "property":
-                        arguments.append(self.loadProperty(child, getIterCat(iterationNode)), iterationIndex)
+                        arguments.append(self.loadProperty(child, self.getIterCat(iterationNode), iterationIndex))
                     else:
                         raise badxml("<" + child.tag + "> is not a valid child for <argument>")
 
@@ -165,7 +173,7 @@ class StructureXMLParser:
                         arguments.append(child.tail)
                         
         try:
-            cmd = LaTeXCommand(commandNodeInfo["label"], arguments)
+            cmd = LaTeXCommand(commandNode.attrib["label"], arguments)
             if option is not None:
                 cmd.option = option
             return cmd
@@ -173,7 +181,7 @@ class StructureXMLParser:
             raise badxml("<command> is missing a label")
 
     def loadProperty(self, propertyNode, iterationSection=None, iterationIndex = -1):
-        if len(propertyNode) > 0 or propertyNode.text is not None or propertyNode.tail is not None:
+        if len(propertyNode) > 0 or propertyNode.text is not None:
             raise badxml("poorly formatted <property> - cannot have children or encapsulate any text")
         resumeSection = ""
         resumeField = ""
@@ -193,12 +201,15 @@ class StructureXMLParser:
         if iterationSection is not None:
             parent = getattr(self.resumeObj, iterationSection)
             #parent would be a list
-            categoryClassification = getattr(parent[iterationIndex], resumeSection)
+            #categoryClassification = getattr(parent[iterationIndex], resumeSection)
+            categoryClassification = parent[iterationIndex]
         else:
             parent = self.resumeObj
             #parent would be an object
             categoryClassification = getattr(parent, resumeSection)
-        return str(getattr(categoryClassification, sectionField))
+        try:
+            return str(getattr(categoryClassification, sectionField))
+        except AttributeError: return str(categoryClassification)
 
     def parseOption(self, optionNode, iterationSection=None):
         s = ""
@@ -207,7 +218,7 @@ class StructureXMLParser:
         #can only have <property> child
         for child in optionNode:
             if child.tag == "property":
-                s += loadProperty(child, iterationSection)
+                s += self.loadProperty(child, iterationSection)
                 if child.tail is not None:
                     s += child.tail
             else:
