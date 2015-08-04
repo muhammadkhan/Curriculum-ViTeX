@@ -27,7 +27,7 @@
 	    <property category="experience" content="title" />
 	  </argument>
 	</command>
-	<property category="experience" content="desription" />
+	<property category="experience" content="description" />
       </iteration>
     </environment>
 

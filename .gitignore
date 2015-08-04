@@ -14,3 +14,6 @@
 
 # RML #
 resume.rml
+
+# generated TeX Files
+*_cv.tex
