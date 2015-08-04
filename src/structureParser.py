@@ -199,6 +199,8 @@ class StructureXMLParser:
         parent = None
         categoryClassification = None
         if iterationSection is not None:
+            if type(iterationSection) is not str:
+                print(iterationSection)
             parent = getattr(self.resumeObj, iterationSection)
             #parent would be a list
             #categoryClassification = getattr(parent[iterationIndex], resumeSection)
@@ -241,10 +243,11 @@ class StructureXMLParser:
                 #possibilities for child:
                 #                       <command>
                 #                       <property />
+                iterationSection = self.getIterCat(iterationNode)
                 if child.tag == "command":
                     iterContents.append(self.parseCommand(child, iterationNode, i))
                 elif child.tag == "property":
-                    iterContents.append(self.loadProperty(child, iterationNode, i))
+                    iterContents.append(self.loadProperty(child, iterationSection, i))
                 else:
                     raise badxml("<iteration> can only have <command> or <property /> children")
                     

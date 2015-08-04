@@ -30,7 +30,7 @@ def environmentWrite(fileObj, env):
     if len(env.option) > 0:
         fileObj.write("[" + env.option + "]")
     fileObj.write("{" + env.name + "}")
-    
+
     for obj in env.cmds_and_envs:
         if type(obj) is LaTeXCommand:
             fileObj.write(commandStr(obj) + "\n")

@@ -35,22 +35,19 @@ class RMLParser:
             if(experNode.tag != "experience"):
                 raise badrml("only <experience> allowed")
             experience = Experience()
-            fields = {
-                "title" : experience.title,
-                "employer" : experience.employer,
-                "duration" : experience.duration,
-                "description" : experience.desc
-            }
+            fields = ["title","employer","duration","description"]
             for child in experNode:
                 #possibilities for child:
                 #                       <title>
                 #                       <employer>
                 #                       <duration>
                 #                       <description>
-                if(child.tag in fields.keys()):
-                    fields[child.tag] = child.text
+                if child.tag in fields:
+                    #fields[child.tag] = child.text
+                    setattr(experience, child.tag, child.text)
                 else:
                     raise badrml("<experience> can only take so much")
+            experiences.append(experience)
                     
         return experiences
 

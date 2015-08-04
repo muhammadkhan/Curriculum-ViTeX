@@ -13,7 +13,9 @@ def genXMLFilePath(folder):
     return path
 
 if __name__ == "__main__":
-    parsed = rmlp(sys.argv[1]).res
-    texdoc = xmlp(parsed, genXMLFilePath(sys.argv[2])).texdoc
+    resm = rmlp(sys.argv[1]).res
+    texdoc = xmlp(resm, genXMLFilePath(sys.argv[2])).texdoc
     writeLaTeX(texdoc, sys.argv[2])
-    
+    print("EXPERIENCES: length=", len(resm.experiences))
+    for exp in resm.experiences:
+        print(exp.title,"@",exp.employer,"from",exp.duration)

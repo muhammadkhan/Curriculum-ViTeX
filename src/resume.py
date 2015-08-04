@@ -30,7 +30,7 @@ class Experience:
         self.title = ""
         self.employer = ""
         self.duration = ""
-        self.desc = ""
+        self.description = ""
         
 class Resume:
     def __init__(self):
