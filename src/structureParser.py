@@ -60,25 +60,47 @@ class StructureXMLParser:
             packages.append(packageTuple)
         return packages
 
-    def loadBody(self, documentNode):
+    def loadBody(self, docNode):
         body = None
         cmds_and_envs = []
-        for child in documentNode:
+        if docNode.text is not None:
+            cmds_and_envs.append(docNode.text)
+        parse_routines = {
+            "command" : self.parseCommand,
+            "environment" : self.parseEnvironment,
+            "iteration" : self.parseIteration,
+            "property" : self.loadProperty
+        }
+        for child in docNode:
             #possibilities for child:
             #                       <command>
             #                       <environment>
             #                       <iteration>
-            #                       <text>
-            if child.tag == "command":
-                cmds_and_envs.append(self.parseCommand(child))
-            elif child.tag == "environment":
-                cmds_and_envs.append(self.parseEnvironment(child))
-            elif child.tag == "iteration":
-                pass
-            elif child.tag == "text":
-                pass
+            #                       <property />
+            if child.tag in parse_routines.keys():
+                res = parse_routines[child.tag]
+                try:
+                    cmds_and_envs.append(res)
+                except TypeError:
+                    cmds_and_envs.extend(res)
             else:
-                raise badxml("<" + child.tag + "> not a valid descendant of <document>")
+                raise badxml("<" + child.tag + "> is not a valid descendant of <document>")
+                    
+            # if child.tag == "command":
+            #     cmds_and_envs.append(self.parseCommand(child))
+            # elif child.tag == "environment":
+            #     cmds_and_envs.append(self.parseEnvironment(child))
+            # elif child.tag == "iteration":
+            #     cmds_and_envs.extend(self.parseIteration(child))
+            # elif child.tag == "property":
+            #     cmds_and_envs.append(self.loadProperty(child))
+            # else:
+            #     raise badxml("<" + child.tag + "> is not a valid descendant of <document>")
+
+            if child.tail is not None:
+                cmds_and_envs.append(child.tail)
+
+        body = Body(cmds_and_envs)
         return body
 
     def getIterCat(self, iterationNode):
@@ -89,7 +111,7 @@ class StructureXMLParser:
         except KeyError:
             raise badxml("<iteration> needs 'category'")        
 
-    def parseCommand(self, commandNode, iterationNode=None):
+    def parseCommand(self, commandNode, iterationNode=None, iterationIndex = -1):
         #a <command> can only contain <argument>
         #or an <option>
         commandNodeInfo = commandNode.attrib
@@ -107,7 +129,7 @@ class StructureXMLParser:
         arguments = []
         for argument in commandNode:
             if argument.tag == "option":
-                option = self.parseOption(argument, iteration)
+                option = self.parseOption(argument, getIterCat(iterationNode))
                 continue
             elif argument.tag != "argument":
                 raise badxml("<command> can only contain <argument> tags")
@@ -131,7 +153,7 @@ class StructureXMLParser:
                         #recursion ftw
                         arguments.extend(self.parseCommand(child))
                     elif child.tag == "property":
-                        arguments.append(self.loadProperty(child, getIterCat(iterationNode)))
+                        arguments.append(self.loadProperty(child, getIterCat(iterationNode)), iterationIndex)
                     else:
                         raise badxml("<" + child.tag + "> is not a valid child for <argument>")
 
@@ -143,7 +165,7 @@ class StructureXMLParser:
         except KeyError:
             raise badxml("<command> is missing a label")
 
-    def loadProperty(self, propertyNode, iterationSection=None):
+    def loadProperty(self, propertyNode, iterationSection=None, iterationIndex = -1):
         if len(propertyNode) > 0 or propertyNode.text is not None or propertyNode.tail is not None:
             raise badxml("poorly formatted <property> - cannot have children or encapsulate any text")
         resumeSection = ""
@@ -159,8 +181,16 @@ class StructureXMLParser:
         #                       the education object, containing schools
         #                       the courses object, containing courses
         #                       the experiences obj, containing exp's
-        parent = getattr(self.resumeObj, iterationSection) if iterationSection is not None else self.resumeObj
-        categoryClassification = getattr(parent, resumeSection)
+        parent = None
+        categoryClassification = None
+        if iterationSection is not None:
+            parent = getattr(self.resumeObj, iterationSection)
+            #parent would be a list
+            categoryClassification = getattr(parent[iterationIndex], resumeSection)
+        else:
+            parent = self.resumeObj
+            #parent would be an object
+            categoryClassification = getattr(parent, resumeSection)
         return str(getattr(categoryClassification, sectionField))
 
     def parseOption(self, optionNode, iterationSection=None):
@@ -176,6 +206,34 @@ class StructureXMLParser:
             else:
                 raise badxml("<option> can only have <property>")
 
+    def parseIteration(self, iterationNode):
+        section = None
+        iterInfo = iterationNode.attrib
+        try:
+            section = getattr(self.resumeObj, iterInfo["category"])
+        except KeyError:
+            raise badxml("<iteration> missing a category")
+        except AttributeError:
+            raise badxml("\"" + iterInfo["category"] + "\" does not correspond to an appropriate iterable")
+        iterContents = []
+        for i in range(0, len(section)):
+            if iterationNode.text is not None:
+                iterContents.append(iterationNode.text)
+            for child in iterationNode:
+                #possibilities for child:
+                #                       <command>
+                #                       <property />
+                if child.tag == "command":
+                    iterContents.append(self.parseCommand(child, iterationNode, i))
+                elif child.tag == "property":
+                    iterContents.append(self.loadProperty(child, iterationNode, i))
+                else:
+                    raise badxml("<iteration> can only have <command> or <property /> children")
+                    
+                if child.tail is not None:
+                    iterContents.append(child.tail)
+        return iterContents
+
     def parseEnvironment(self, environmentNode):
         #presently, let's assume an environment
         # can never be iterated
@@ -190,12 +248,24 @@ class StructureXMLParser:
         #                       <option>
         for child in environmentNode:
             if child.tag == "command":
-                pass
+                cmds_and_envs.append(self.parseCommand(child))
             elif child.tag == "environment":
-                pass
+                cmds_and_envs.append(self.parseEnvironment(child))
             elif child.tag == "iteration":
-                pass
+                cmds_and_envs.extend(self.parseIteration(child))
             elif child.tag == "option":
                 option = self.parseOption(child)
             else:
                 raise badxml("<" + child.tag + "> cannot be in an environment")
+
+            if child.tail is not None:
+                cmds_and_envs.append(child.tail)
+
+        try:
+            env = Environment(environmentNode.attrib["label"], cmds_and_envs)
+        except KeyError:
+            raise badxml("<environment> missing a 'label' attribute")
+
+        if option is not None:
+            env.option = option
+        return env

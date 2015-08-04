@@ -32,7 +32,8 @@ class Environment:
         self.cmds_and_envs = cmds_and_envs
 
 class Body:
-    
+    def __init__(self, contents):
+        self.contents = contents
 
 class TeXStructure:
     def __init__(self, fp):
