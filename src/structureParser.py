@@ -53,9 +53,9 @@ class StructureXMLParser:
                 raise badxml("<package> can have at most 2 children")
             packageTuple = None
             try:
-                if packageNode[0] == "option" and packageNode[1] == "value":
+                if packageNode[0].tag == "option" and packageNode[1].tag == "value":
                     packageTuple = (packageNode[1].text, packageNode[0].text)
-                elif packageNode[1] == "option" and packageNode[0] == "value":
+                elif packageNode[1].tag == "option" and packageNode[0].tag == "value":
                     packageTuple = (packageNode[0].text, packageNode[1].text)
                 else:
                     raise badxml("<package> must have one of each <option> and <value>")

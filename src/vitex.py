@@ -4,6 +4,7 @@ sys.path.append(pardir + sep)
 from resumeParser import RMLParser as rmlp
 from structureParser import StructureXMLParser as xmlp
 from structureParser import SUFFIX
+from latex_writer import writeLaTeX
 
 def genXMLFilePath(folder):
     path = "templates/"
@@ -12,6 +13,7 @@ def genXMLFilePath(folder):
     return path
 
 if __name__ == "__main__":
-    parsed = rmlp(sys.argv[1])
-    texdoc = xmlp(parsed, genXMLFilePath(sys.argv[2]))
+    parsed = rmlp(sys.argv[1]).res
+    texdoc = xmlp(parsed, genXMLFilePath(sys.argv[2])).texdoc
+    writeLaTeX(texdoc, sys.argv[2])
     print("Success!")
