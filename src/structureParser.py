@@ -42,7 +42,6 @@ class StructureXMLParser:
                 texdoc.documentBody = self.loadBody(child)
             else:
                 raise badxml("<" + child.tag + "> is not a valid direct child of <structure>")
-
         self.texdoc = texdoc
 
     def loadPackages(self, packagesNode):

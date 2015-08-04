@@ -7,8 +7,8 @@ from structureParser import SUFFIX
 
 def genXMLFilePath(folder):
     path = "templates/"
-    path += folder
-    path += "/" + folder + SUFFIX
+    path += folder + "/"
+    path += folder + SUFFIX
     return path
 
 if __name__ == "__main__":
