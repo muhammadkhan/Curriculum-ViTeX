@@ -214,6 +214,7 @@ class StructureXMLParser:
                 print(s)
             else:
                 raise badxml("<option> can only have <property>")
+        return s
 
     def parseIteration(self, iterationNode):
         section = None
