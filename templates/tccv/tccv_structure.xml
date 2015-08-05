@@ -74,5 +74,17 @@
 	</command>
       </iteration>
     </environment>
+
+    <command label="section" args="1">
+      <argument>Skills</argument>
+    </command>
+    <environment label="factlist">
+      <iteration category="skills">
+	<command label="item" args="2">
+	  <argument></argument>
+	  <argument><property category="skills" content="skill"/></argument>
+	</command>
+      </iteration>
+    </environment>
   </document>
 </structure>

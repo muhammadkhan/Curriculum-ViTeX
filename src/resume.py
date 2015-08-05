@@ -39,6 +39,18 @@ class Experience:
         self.employer = ""
         self.duration = ""
         self.description = ""
+
+class Skill:
+    
+    def __init__(self, name, level):
+        LEVELS = ["expert", "good", "average", "basic"]
+        if level not in LEVELS:
+            raise ValueError("invalid 'level' - could not instantiate skill")
+        self.level = level
+        self.name = name
+
+    def __str__(self):
+        return self.name
         
 class Resume:
     def __init__(self):
@@ -46,3 +58,4 @@ class Resume:
         self.education = []
         self.courses = []
         self.experiences = []
+        self.skills = []

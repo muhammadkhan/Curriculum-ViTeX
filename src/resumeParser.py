@@ -15,6 +15,7 @@ class RMLParser:
             #                        <education>
             #                        <courses>
             #                        <experiences>
+            #                        <skills>
             if(child.tag == "personal"):
                 resm.personal = self.loadPersonal(child)
             elif(child.tag == "education"):
@@ -23,10 +24,31 @@ class RMLParser:
                 resm.courses = self.loadCourses(child)
             elif(child.tag == "experiences"):
                 resm.experiences = self.loadExperiences(child)
+            elif(child.tag == "skills"):
+                resm.skills = self.loadSkills(child)
             else:
                 raise badrml("<" + child.tag + "> is not a valid descendant of <resume>")
 
         self.res = resm
+
+    def loadSkills(self, skillsNode):
+        skills = []
+        for skillNode in skillsNode:
+            if skillNode.tag != "skill":
+                raise badrml("only <skill> allowed in <skills>")
+            if len(skillNode) > 0:
+                raise badrml("<skill> cannot have any children")
+            if skillNode.text is None or len(skillNode.text.strip()) == 0:
+                raise badrml("empty <skill> somewhere")
+            try:
+                lvl = skillNode.attrib["level"]
+                skills.append(Skill(skillNode.text, lvl))
+            except KeyError:
+                raise badrml("<skill> missing 'level' attribute")
+            except ValueError:
+                raise badrml("'" + lvl + "' is an invalid skill level")
+        return skills
+                
 
     def loadExperiences(self, experiencesNode):
         experiences = []

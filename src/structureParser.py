@@ -90,17 +90,6 @@ class StructureXMLParser:
                     cmds_and_envs.extend(r(child))
             else:
                 raise badxml("<" + child.tag + "> is not a valid descendant of <document>")
-                    
-            # if child.tag == "command":
-            #     cmds_and_envs.append(self.parseCommand(child))
-            # elif child.tag == "environment":
-            #     cmds_and_envs.append(self.parseEnvironment(child))
-            # elif child.tag == "iteration":
-            #     cmds_and_envs.extend(self.parseIteration(child))
-            # elif child.tag == "property":
-            #     cmds_and_envs.append(self.loadProperty(child))
-            # else:
-            #     raise badxml("<" + child.tag + "> is not a valid descendant of <document>")
 
             if child.tail is not None:
                 cmds_and_envs.append(child.tail)
