@@ -211,7 +211,6 @@ class StructureXMLParser:
                 s += self.loadProperty(child, iterationSection)
                 if child.tail is not None:
                     s += child.tail
-                print(s)
             else:
                 raise badxml("<option> can only have <property>")
         return s

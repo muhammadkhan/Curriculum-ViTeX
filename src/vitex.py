@@ -16,10 +16,3 @@ if __name__ == "__main__":
     resm = rmlp(sys.argv[1]).res
     texdoc = xmlp(resm, genXMLFilePath(sys.argv[2])).texdoc
     writeLaTeX(texdoc, sys.argv[2])
-    for child in texdoc.documentBody.contents:
-        try:
-            if child.name == "personal":
-                print("personal option =",child.option)
-                print("sizeof(option)=",len(child.option))
-        except:
-            print("errrrrrrrrrrrrr")
