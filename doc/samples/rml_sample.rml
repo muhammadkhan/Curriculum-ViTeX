@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<resume>
+  <personal>
+    <name>Your Name Goes Here</name>
+    <phone>1234567890x7438392</phone>
+    <email>you@you.com</email>
+    <address>Probably Not a Box</address>
+    <website>www.you.com</website>
+  </personal>
+  
+  <education>
+    <school beginning="???" end="???">
+      <name>College</name>
+      <majors>
+	<major>What Did You Study?</major>
+      </majors>
+      <degrees>
+	<degree>???</degree>
+      </degrees>
+      <gpa value="infinity" maximum="0.0" />
+      <comment>
+	Anything special?
+      </comment>
+    </school>
+
+    <school beginning="???" end="???">
+      <name>High School</name>
+      <degrees>
+	<degree>High School Diploma</degree>
+      </degrees>
+      <gpa value="infinity^2" maximum="0.0" />
+      <comment>Slept a lot</comment>
+    </school>
+  </education>
+
+  <courses>
+    <course>Advanced Sleeping</course>
+  </courses>
+
+  <experiences>
+    <experience>
+      <title>Serial Sleeper</title>
+      <employer>Home</employer>
+      <duration>Lifetime</duration>
+      <description>
+	Need I say more?
+      </description>
+    </experience>
+  </experiences>
+
+  <skills>
+    <skill level="expert">Sleeping</skill>
+    <skill level="good">Watching TV</skill>
+    <skill level="average">Getting Dressed</skill>
+    <skill level="basic">Being Productive</skill>
+  </skills>
+</resume>

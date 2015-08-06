@@ -1,0 +1,91 @@
+<?xml version="1.0"?>
+<structure>
+  <packages>
+    <package>
+      <option>margin=.75in</option>
+      <value>geometry</value>
+    </package>
+  </packages>
+
+  <document>
+    <command label="title" args="1">
+      <argument><property category="personal" content="name" /></argument>
+    </command>
+    <command label="maketitle" args="0"></command>
+    <command label="section" args="1">
+      <argument>Work Experience</argument>
+    </command>
+    <environment label="itemize">
+      <iteration category="experiences">
+	<command label="item" args="3">
+	  <argument>
+	    <property category="experience" content="duration" />
+	  </argument>
+	  <argument>
+	    <property category="experience" content="employer" />
+	  </argument>
+	  <argument>
+	    <property category="experience" content="title" />
+	  </argument>
+	</command>
+	<property category="experience" content="description" />
+      </iteration>
+    </environment>
+
+
+    Web: <property category="personal" content="website" />
+    Address: <property category="personal" content="address" />
+    Phone: <property category="personal" content="phone" />
+    Email: <property category="personal" content="email" />
+
+    
+    <command label="section" args="1">
+      <argument>Education</argument>
+    </command>
+    <environment label="enumerate">
+      <iteration category="education">
+	<command label="item" args="3">
+	  <option>
+	    GPA: <property category="school" content="gpa" />
+	  </option>
+	  <argument>
+	    <property category="school" content="beginning" />
+	    <property category="school" content="end" />
+	  </argument>
+	  <argument>
+	    <property category="school" content="name" />
+	  </argument>
+	  <argument>
+	    <property category="school" content="degrees" />
+	  </argument>
+	</command>
+      </iteration>
+    </environment>
+
+    <command label="section" args="1">
+      <argument>Relevant Coursework</argument>
+    </command>
+    <environment label="enumerate">
+      <iteration category = "courses">
+	<command label="item" args="2">
+	  <argument></argument>
+	  <argument>
+	    <property category="courses" content = "course"/>
+	  </argument>
+	</command>
+      </iteration>
+    </environment>
+
+    <command label="section" args="1">
+      <argument>Skills</argument>
+    </command>
+    <environment label="itemize">
+      <iteration category="skills">
+	<command label="item" args="2">
+	  <argument></argument>
+	  <argument><property category="skills" content="skill"/></argument>
+	</command>
+      </iteration>
+    </environment>
+  </document>
+</structure>

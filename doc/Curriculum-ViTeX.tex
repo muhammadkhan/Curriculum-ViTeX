@@ -1,0 +1,135 @@
+\documentclass[12pt]{article}
+\usepackage[margin=0.75in]{geometry}
+\usepackage{amsmath, amsfonts, amssymb}
+\usepackage{graphicx, hyperref}
+
+\newcommand{\xmltag}[1]{$\tt{\langle #1 \rangle}$}
+
+\begin{document}
+\begin{titlepage}
+  \vspace*{\fill}
+  \begin{center}
+    {\Huge Curriculum ViTeX: A Beautiful Resume-Oriented\\
+           Marriage between \LaTeX\ and XML}\\[0.5cm]
+    {\Large Muhammad Khan}\\[0.4cm]
+    Instruction Manual
+  \end{center}
+  \vspace*{\fill}
+\end{titlepage}
+\section*{Introduction}
+\subsection*{Once Upon a Time}
+One day, as I was looking to update and polish my resume, I gathered about
+two or three \LaTeX\ templates that I wanted to try out. After realizing
+I was typing the same information over and over again, just in different
+environments governed by different \emph{.cls} files, I figured there should be
+a simple utility that just extracts this information from one master file and
+fills it in where it should be. Given the option to search the internet for such
+a program, or simply writing it myself, I of course went with the latter -
+and thus Curriculum ViTeX was born.
+\subsection*{Outline}
+Curriculum ViTeX is written mostly in Python, and was developed and tested using
+Python 3.4.3. The inputs to the program will be user-supplied XML files (more 
+on that later) and the whole program will be run with the top-level script $\tt{cvitex.sh}$.
+\subsection*{Contact}
+I can be reached at $\tt{mhk98@cornell.edu}$. This project is hosted
+on GitHub at \url{http://github.com/muhammadkhan/Curriculum-ViTeX}.
+\subsection*{Prerequisites}
+To fully be able to understand and use Curriculum ViTeX, you should
+be well-versed in both \LaTeX\ and XML, the former a very popular
+document typesetting environment and the latter a simple yet powerful
+markup language. I have personally used the following tutorials to
+learn these two systems in the past, and frequently consult them
+as reference:
+\begin{itemize}
+\item \LaTeX\ tutorial: \url{http://artofproblemsolving.com/wiki/index.php/LaTeX}
+\item XML tutorial: \url{http://www.tizag.com/xmlTutorial/}
+\end{itemize}
+\section*{Getting Started}
+You can download the application off of the GitHub URL above, either by
+cloning the repository or downloading the zip. The following directories and
+ files are essential to running Curriculum ViTeX; make sure they are there an
+intact:
+\begin{itemize}
+\item $\tt{cvitex.sh}$
+\item $\tt{src/}$
+\item $\tt{templates/}$
+\end{itemize}
+The latter directory is where you will find some sample templates to try the
+program out, and where you will place any personal styles you would like to
+the program to use.
+\section*{RML: Resume Markup Language}
+Resume Markup Language (RML) is a subset of XML that is employed to describe
+resume skeletons. It is the master file used in Curriculum ViTeX from which
+the program will fill in all necessary information in all the resume templates. 
+RML files are denoted with a $\tt{.rml}$ extension. You can familiarize yourself
+with the sample RML provided in $\tt{doc/samples/rml\_sample.rml}$. The
+XML formatting is pretty straightforward. Here are a few key observations
+to note:
+\begin{enumerate}
+\item The root tag is \xmltag{resume}
+\item The only allowable children for the \xmltag{resume} tag are:
+      \xmltag{personal}, \xmltag{education}, \xmltag{courses}, \xmltag{experiences}
+      and \xmltag{skills}
+\item Phone numbers can have at most up to one extension
+\item Phone numbers (minus extension) must have length 10
+\item The only allowable children for \xmltag{personal} are: 
+      \xmltag{name}, \xmltag{phone}, \xmltag{email}, \xmltag{address} and
+      \xmltag{website}
+\item The \xmltag{education} tag can only have \xmltag{school} tags as
+      children
+\item Each \xmltag{school} \emph{must} have numerical attributes called
+      ``beginning'' and ``end''
+\item The \xmltag{majors} can only have \xmltag{major} tags as children
+\item The \xmltag{degrees} can only have \xmltag{degree} tags as children
+\item The \xmltag{gpa} tag \emph{must} have numerical attributes called
+      ``value'' and ``maximum''
+\item Each \xmltag{school} can only have \xmltag{name}, \xmltag{majors}, 
+      \xmltag{degrees}, \xmltag{gpa} and \xmltag{comment} as children
+\item The \xmltag{courses} tag can only have \xmltag{course} children
+\item The \xmltag{skills} tag can only have \xmltag{skill} children, each
+      of which must have a ``level'' attribute set to one of the four
+      options shown in the sample file
+\item The \xmltag{experiences} tag can only have \xmltag{experience}
+      tags as children
+\item Each \xmltag{experience} can only have \xmltag{title}, \xmltag{employer},
+      \xmltag{duration} and \xmltag{description} as children tags
+\end{enumerate}
+Breaking any of these conventions will cause the program to complain
+and you will not be able to generate your TeX resumes. However, you do
+not have to include all of these tags if you would not like your
+resume to have them.
+\newpage
+\section*{Resume Templates}
+In the previous section, we went over the standards of the RML
+markup language. If you follow those, then the program will be able
+to successfully draw your information out of the file. Now, we focus
+on creating the actual \LaTeX\ templates that this information will
+fill. A smple is provided in $\tt{doc/samples/sample\_structure.xml}$.
+The most important rule for templates is this:
+$$\text{For 'mytemplate' to qualify as as a valid template,}$$
+$$\text{you must save the XML file as}$$
+$$\tt{templates/mytemplate/mytemplate\_structure.xml}$$
+Furthermore, any relevant \textit{.cls} and \textit{.sty} files must also
+reside in the same directory as the XML file. \textbf{If there is a .cls file, its name must be the same as its directory.}
+In our example, the \textit{.cls} file name would have to be $\tt{mytemplate.cls}$.\\ \\
+As with RML, any $\tt{*\_structure.xml}$ file must be properly formatted.
+The format can be easily understood from looking at the sample.
+\section*{Running the Program}
+As mentioned previously, the program can be run using the $\tt{cvitex.sh}$ script. In a terminal (command prompt), navigate to the program's
+top-level directory. A run of the program constitutes executing the
+following type of statement:
+$$\tt{./cvitex.sh\ /path/to/RML/file/x.rml\ t\_1\ t\_2\ \cdots\ t\_n}$$
+where each of the arguments following the RML file corresponds to a
+template. For each $\tt{t\_i}$, the program assumes:
+\begin{itemize}
+\item $\tt{templates/t\_i/}$ exists
+\item $\tt{templates/t\_i/t\_i\_structure.xml}$ exists
+\item If there is any \textit{.cls} file in $\tt{templates/t\_i/}$
+      then it is named $\tt{t\_i.cls}$
+\end{itemize}
+If everything goes smoothly, then you will find a fully-formatted
+\LaTeX\ document in the template's directory with the suffix
+$\tt{\_cv.tex}$. Feel free to make further edits to this file for
+particular fine-tuning, or compile as-is (tested to compile using
+$\tt{pdflatex}$).
+\end{document}
