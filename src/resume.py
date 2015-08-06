@@ -50,7 +50,7 @@ class Skill:
         self.name = name
 
     def __str__(self):
-        return self.name
+        return self.name + " (" + self.level + ")"
         
 class Resume:
     def __init__(self):
