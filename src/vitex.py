@@ -24,7 +24,15 @@ def genXMLFilePath(folder):
     path += folder + SUFFIX
     return path
 
+def main(rmlFilePath, templatesList):
+    """This is the function that can be used
+    if vitex.py is imported as a library module instead
+    of being run as main
+    """
+    resm = rmlp(rmlFilePath).res
+    for template in templatesList:
+        texdoc = xmlp(resm, genXMLFilePath(template)).texdoc
+        writeLaTeX(texdoc, template)
+
 if __name__ == "__main__":
-    resm = rmlp(sys.argv[1]).res
-    texdoc = xmlp(resm, genXMLFilePath(sys.argv[2])).texdoc
-    writeLaTeX(texdoc, sys.argv[2])
+    main(sys.argv[1], sys.argv[2:])
