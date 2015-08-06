@@ -28,7 +28,7 @@
       <degrees>
 	<degree>High School Diploma</degree>
       </degrees>
-      <gpa value="infinity^2" maximum="0.0" />
+      <gpa value="infinity" maximum="0.0" />
       <comment>Slept a lot</comment>
     </school>
   </education>
