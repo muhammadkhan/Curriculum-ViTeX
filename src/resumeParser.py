@@ -1,9 +1,29 @@
+## Curriculum ViTeX
+#  (C) 2015 Muhammad Khan
+#
+#  This software is licensed under
+#  the MIT Public License
+
+"""resumeParser.py
+
+This module defines a parser object which is
+used to parse an RML document and generate a
+full Resume object.
+"""
+
 import xml.etree.ElementTree as ET
 from resume import *
 from cvitexexceptions import InvalidRMLFileException as badrml
 
 class RMLParser:
+    """Object that represents a parser for an RML file"""
     def __init__(self, rmlFilePath):
+        """Creates a new parser object with a 'resm' property
+        of type Resume (defined in resume.py)
+
+        Parameters: rmlFilePath - the path pointing to the RML
+                                  file of interest [string]
+        """
         resumeTree = ET.parse(rmlFilePath)
         resumeRoot = resumeTree.getroot()
         if(resumeRoot.tag != "resume"):
@@ -32,6 +52,14 @@ class RMLParser:
         self.res = resm
 
     def loadSkills(self, skillsNode):
+        """Takes a <skills> tag and returns a list of Skill objects
+
+        Parameters: skillsNode - the object corresponding to the
+                                 <skills> tag [ElementTree tag]
+
+        Returns: a list of the different Skill objects that skillsNode
+                 encapsulates
+        """
         skills = []
         for skillNode in skillsNode:
             if skillNode.tag != "skill":
@@ -51,6 +79,13 @@ class RMLParser:
                 
 
     def loadExperiences(self, experiencesNode):
+        """Takes an <experiences> tag and returns a list of Experience objects
+
+        Parameters: experiencesNode - the object corresponding to the
+                                 <experiences> tag [ElementTree tag]
+
+        Returns: a list of the different Experience objects that experiencesNode encapsulates
+        """
         experiences = []
 
         for experNode in experiencesNode:
@@ -74,6 +109,14 @@ class RMLParser:
         return experiences
 
     def loadCourses(self, coursesNode):
+        """Takes a <courses> tag and returns a list of the courses
+
+        Parameters: coursesNode - the object corresponding to the
+                                 <courses> tag [ElementTree tag]
+
+        Returns: a list of the different courses (strings) that coursesNode
+                 encapsulates
+        """
         courses = []
         for i in range(0,len(coursesNode)):
             course = coursesNode[i]
@@ -83,15 +126,31 @@ class RMLParser:
         return courses
 
     def loadEducation(self, educationNode):
+        """Takes an <education> tag and returns a list of School objects
+
+        Parameters: educationNode - the object corresponding to the
+                                 <education> tag [ElementTree tag]
+
+        Returns: a list of the different School objects that educationNode
+                 encapsulates
+        """
         education = []
         for schoolNode in educationNode:
             if(schoolNode.tag != "school"):
                 raise badrml("<school> is the only valid child for <education>")
             schoolDict = schoolNode.attrib
+            schoolBeg = ""
+            schoolEnd = ""
             try:
-                school = School(schoolDict["beginning"], schoolDict["end"])
+                schoolBeg = schoolDict["beginning"]
+                schoolEnd = schoolDict["end"]
             except KeyError:
-                raise badrml("<school> missing beginning and end attributes")
+                raise badrml("<school> missing 'beginning' and 'end' attributes")
+            name = ""
+            majors = []
+            degrees = []
+            gpa = None
+            comment = ""
             for child in schoolNode:
                 #possibilites for child:
                 #                      <name>
@@ -100,38 +159,47 @@ class RMLParser:
                 #                      <gpa>
                 #                      <comment>
                 if(child.tag == "name"):
-                    school.name = child.text
+                    name = child.text
                 elif(child.tag == "majors"):
-                    majors = []
                     for i in range(0,len(child)):
                         if(child[i].tag != "major"):
                             raise badrml("only <major> allowed")
                         majors.append(child[i].text)
-                    school.majors = majors
                 elif(child.tag == "degrees"):
-                    degrees = []
                     for i in range(0,len(child)):
                         if(child[i].tag != "degree"):
                             raise badrml("only <degree> allowed")
                         degrees.append(child[i].text)
-                    school.degrees = degrees
                 elif(child.tag == "gpa"):
                     gpaInfo = child.attrib
                     try:
                         gpaActual = float(gpaInfo["value"])
                         gpaMax = float(gpaInfo["maximum"])
-                        school.gpa = (gpaActual, gpaMax)
+                        gpa = (gpaActual, gpaMax)
                     except KeyError:
                         raise badrml("missing gpa attributes")
                 elif(child.tag == "comment"):
-                    school.comment = child.text
+                    comment = child.text
                 else:
                     raise badrml("some invalid school children")
+            school = School(schoolBeg, schoolEnd, name, majors, degrees, gpa, comment)
             education.append(school)
         return education
 
     def loadPersonal(self, personalNode):
-        personal = Personal()
+        """Converts a <personal> tag into a Personal object
+
+        Parameters: personalNode - the object corresponding to the
+                                 <personal> tag [ElementTree tag]
+
+        Returns: The Personal object with the appropriate information
+                 filled in
+        """
+        name = ""
+        phone = None
+        email = ""
+        address = ""
+        web = ""
         for child in personalNode:
             #possibilities for child:
             #                       <name>
@@ -140,7 +208,7 @@ class RMLParser:
             #                       <address>
             #                       <website>
             if(child.tag == "name"):
-                personal.name = child.text
+                name = child.text
             elif(child.tag == "phone"):
                 ext = ""
                 #phone number validation
@@ -153,13 +221,13 @@ class RMLParser:
                 phone_raw = extSplit[0]
                 if(len(phone_raw) != 10):
                     raise badrml("phone numbers (excluding extension) must have a length of 10")
-                personal.phone = PhoneNumber(phone_raw, ext)
+                phone = PhoneNumber(phone_raw, ext)
             elif(child.tag == "email"):
-                personal.email = child.text
+                email = child.text
             elif(child.tag == "address"):
-                personal.address = child.text
+                address = child.text
             elif(child.tag == "website"):
-                personal.website = child.text
+                website = child.text
             else:
                 raise badrml("<" + child.tag + "> is not a valid child for <personal>")
-        return personal
+        return Personal(name, phone, email, address, web)

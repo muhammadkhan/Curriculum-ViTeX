@@ -1,3 +1,17 @@
+## Curriculum ViTeX
+#  (C) 2015 Muhammad Khan
+#
+#  This software is licensed under
+#  the MIT Public License
+
+"""structureParser.py
+
+This module defines a parser object used to parse the
+*_structure.xml file into the object hierarchy defined by
+the objects in texdocument.py, filling in the appropriate
+values from the parsed RML file as well
+"""
+
 import xml.etree.ElementTree as ET
 from resume import *
 from cvitexexceptions import InvalidStructureXMLFileException as badxml
@@ -9,6 +23,11 @@ def genTexFilePath(sxmlFilePath):
     """Assuming that the XML file name
        is of the format <*>_structure.xml, will generate the
        corresponding tex file: <*>_cv.tex
+
+    Parameters: sxmlFilePath - the file path for the *_structure.xml file [string]
+                               Checks to make sure the file name is appropriate
+
+    Returns: the filepath for the TeX file to be generated
     """
     suffix = sxmlFilePath[-len(SUFFIX):]
     if(suffix != SUFFIX):
@@ -18,6 +37,15 @@ def genTexFilePath(sxmlFilePath):
 
 
 def valid_num_argument_tags(commandNode):
+    """Checks to make sure that there is an appropriate number
+    of <argument> tags underneath 'commandNode', according to the
+    value of its 'args' attribute
+
+    Parameters: commandNode - the object referring to a <command> tag [ElementTree tag]
+
+    Returns: true iff the number of <argument> tags is equal to the value
+             provided in the 'args' attribute; false otherwise
+    """
     expected_value = int(commandNode.attrib["args"])
     ct = 0
     for child in commandNode:
@@ -26,7 +54,14 @@ def valid_num_argument_tags(commandNode):
     return ct == expected_value
 
 class StructureXMLParser:
+    """Object that represents a parser for a *_structure.xml file"""
     def __init__(self, resumeObj, sxmlFilePath):
+        """Creates a new parser object with a 'texdoc' property
+        of type TeXStructure (defined in texdocument.py)
+
+        Parameters: resumeObj - the resume object parsed by the RML parser [Resume]
+                    sxmlFilePath - the file path pointing to the <*>_structure.xml file [string]
+        """
         self.resumeObj = resumeObj
         xmlTree = ET.parse(sxmlFilePath)
         structureTag = xmlTree.getroot()
@@ -46,6 +81,7 @@ class StructureXMLParser:
         self.texdoc = texdoc
 
     def loadPackages(self, packagesNode):
+        """Loads the packages for the LaTeX document"""
         packages = []
         for packageNode in packagesNode:
             if packageNode.tag != "package":

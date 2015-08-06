@@ -1,3 +1,15 @@
+## Curriculum ViTeX
+#  (C) 2015 Muhammad Khan
+#
+#  This software is licensed under
+#  the MIT Public License
+
+"""vitex.py
+
+This module defines the main module to be run
+by cvitex.sh.
+"""
+
 from os.path import pardir, sep
 import sys
 sys.path.append(pardir + sep)

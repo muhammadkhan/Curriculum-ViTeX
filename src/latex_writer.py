@@ -1,3 +1,16 @@
+## Curriculum ViTeX
+#  (C) 2015 Muhammad Khan
+#
+#  This software is licensed under
+#  the MIT Public License
+
+"""latex_writer.py
+
+This module defines the different functions used
+to take a TeXStructure object and use it to actually
+write a valid LaTeX file.
+"""
+
 from resume import *
 from texdocument import *
 import os.path
