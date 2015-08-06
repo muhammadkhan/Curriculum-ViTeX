@@ -17,3 +17,7 @@ resume.rml
 
 # generated TeX Files
 *_cv.tex
+
+#AucTex files
+doc/auto/*
+doc/_region*

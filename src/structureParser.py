@@ -68,7 +68,7 @@ class StructureXMLParser:
     def loadBody(self, docNode):
         body = None
         cmds_and_envs = []
-        if docNode.text is not None:
+        if docNode.text is not None and len(docNode.text.strip()) > 0:
             cmds_and_envs.append(docNode.text)
         parse_routines = {
             "command" : self.parseCommand,
@@ -91,7 +91,7 @@ class StructureXMLParser:
             else:
                 raise badxml("<" + child.tag + "> is not a valid descendant of <document>")
 
-            if child.tail is not None:
+            if child.tail is not None and len(child.tail.strip()) > 0:
                 cmds_and_envs.append(child.tail)
 
         body = Body(cmds_and_envs)
