@@ -47,13 +47,13 @@ struct tex_blob {
 };
 
 int write_dump(const char* data_dump){
+  struct tex_blob* dump;
+  char* unpadded_fname, *iter, *full_fname;
+  FILE* f;
   if(data_dump == NULL){
     perror("dat null dump");
     return -1;
   }
-  struct tex_blob* dump;
-  char* unpadded_fname, *iter, *full_fname;
-  FILE* f;
   unpadded_fname = "";
   dump = (struct tex_blob*)data_dump;
   for(iter = dump->padded_fname; *iter != PADDING_CHAR; ++iter)
