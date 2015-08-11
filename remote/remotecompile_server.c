@@ -16,10 +16,12 @@
 
  */
 
+#include <errno.h>
+#include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <errno.h>
 #include <string.h>
+#include <arpa/inet.h>
 #include <sys/socket.h>
 
 #define BUFFER_SIZE 2048
@@ -63,8 +65,40 @@ int main(int argc, char** argv){
 
   /*now we can actually start the main loop */
   while(1){
-    int child_socket_fd;
+    int child_socket_fd, client_length;
     struct sockaddr_in clientaddress;
-    
+    struct hostent* client_host_info;
+    char* client_host_address;
+    char client_msg_buf[BUFFER_SIZE];
+    int bytes_read;
+    client_length = sizeof(clientaddress);
+    child_socket_fd = accept(parent_socket_fd,
+			     (struct sockaddr_in*)&clientaddr,
+			     &client_length);
+    if(child_socket_fd < 0)
+      error_and_quit("Server unable to accept connection from client");
+    client_host_info = gethostbyaddr((const char*)&clientaddress.sin_addr.s_addr,
+				     sizeof(clientaddress.sin_addr.s_addr),
+				     AF_INET);
+    if(client_host_info == NULL)
+      error_and_quit("Server unable to obtain client host");
+    client_host_address = inet_ntoa(clientaddress.sin_addr);
+    if(client_host_address == NULL)
+      error_and_quit("Couldn't convert to dotted-decimal string");
+    printf("SERVER HAS ESTABLISHED CONNECTION WITH %s (%s)\n",
+	   client_host_info->h_name,
+	   client_host_address);
+    memset(client_msg_buf, BUFFER_SIZE);
+    bytes_read = read(child_socket_fd, client_msg_buf, BUFFER_SIZE);
+    if(bytes_read < 0)
+      error_and_quit("Server unable to read message from socket");
+    printf("SERVER HAS RECEIVED %d bytes\n", bytes_read);
+
+    /*now we're going to actually do stuff with this */
+
+
+
+
+    close(child_socket_fd);
   }
 }
