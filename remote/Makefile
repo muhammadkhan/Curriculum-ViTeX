@@ -9,3 +9,10 @@ server: $(SERVER_SRC)
 
 client: $(CLIENT_SRC)
 	$(CC) -o $@ $^
+
+.PHONY: all clean
+
+clean:
+	rm -f *.o
+	rm -f server
+	rm -f client
