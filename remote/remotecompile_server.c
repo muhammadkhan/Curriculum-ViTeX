@@ -24,7 +24,8 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 
-#define BUFFER_SIZE 2048
+#include "serverclientcommon.h"
+
 #define SERVER_QUEUE_LIMIT 7
 
 void error_and_quit(const char* err){
@@ -89,15 +90,26 @@ int main(int argc, char** argv){
 	   client_host_info->h_name,
 	   client_host_address);
     memset(client_msg_buf, BUFFER_SIZE);
-    bytes_read = read(child_socket_fd, client_msg_buf, BUFFER_SIZE);
-    if(bytes_read < 0)
-      error_and_quit("Server unable to read message from socket");
-    printf("SERVER HAS RECEIVED %d bytes\n", bytes_read);
 
-    /*now we're going to actually do stuff with this */
+    /*
+     * One major assumption of this connection is that
+     * if the client sends a full buffer, then there is actually
+     * more data coming, so we loop the reads. When the buffer
+     * is not full, then the client has finished.
+     *
+     * TODO: try to do this without blocking
+     */
+    do{
+      bytes_read = read(child_socket_fd, client_msg_buf, BUFFER_SIZE);
+      if(bytes_read < 0)
+	error_and_quit("Server unable to read message from socket");
+      printf("SERVER HAS RECEIVED %d bytes\n", bytes_read);
 
-
-
+      /*now we're going to actually do stuff with this */
+      if(bytes_read > 0){
+	
+      }
+    } while(bytes_read == BUFFER_SIZE);
 
     close(child_socket_fd);
   }
