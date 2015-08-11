@@ -5,8 +5,6 @@
 
    This software is licensed under the MIT Public License
 
-   PROTOCOL: TCP/IP
-
    This file contains some commonalities shared by both the server
    and client code. 
 

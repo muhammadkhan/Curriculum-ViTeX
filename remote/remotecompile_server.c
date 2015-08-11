@@ -37,10 +37,19 @@ void socket_init(struct sockaddr_in* sock, unsigned short port){
   memset(sock, 0, sizeof(*sock));
   sock->sin_family = AF_INET;
   sock->sin_addr_s_addr = htonl(INADDR_ANY);
-  sock->sin_port = htons(port;
+  sock->sin_port = htons(port);
 }
 
-int main(int argc, char** argv){
+struct tex_blob {
+  char padded_fname[BUFFER_SIZE];
+  char* file_data;
+};
+
+int write_dump(const char* data_dump){
+  
+}
+
+int main(int argc, char** argv) {
   int parent_socket_fd;
   int optval;
   struct sockaddr_in serveraddress;
@@ -72,6 +81,7 @@ int main(int argc, char** argv){
     char* client_host_address;
     char client_msg_buf[BUFFER_SIZE];
     int bytes_read;
+    char* data_dump;
     client_length = sizeof(clientaddress);
     child_socket_fd = accept(parent_socket_fd,
 			     (struct sockaddr_in*)&clientaddr,
@@ -99,18 +109,22 @@ int main(int argc, char** argv){
      *
      * TODO: try to do this without blocking
      */
+    data_dump = "";
     do{
       bytes_read = read(child_socket_fd, client_msg_buf, BUFFER_SIZE);
       if(bytes_read < 0)
 	error_and_quit("Server unable to read message from socket");
       printf("SERVER HAS RECEIVED %d bytes\n", bytes_read);
 
-      /*now we're going to actually do stuff with this */
-      if(bytes_read > 0){
-	
-      }
+      if(bytes_read > 0)
+	strcat(data_dump, client_msg_buf);
     } while(bytes_read == BUFFER_SIZE);
-
+    if(strlen(data_dump) > 0){
+      /* now let's actually do something with all this */
+      if(write_dump(data_dump) < 0)
+	error_and_quit("Unable to successfully compile into PDF - aborting");
+    }
     close(child_socket_fd);
   }
+  return 0;
 }
