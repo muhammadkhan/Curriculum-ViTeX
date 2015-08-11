@@ -26,7 +26,7 @@
 
 #include "serverclientcommon.h"
 
-#define SERVER_QUEUE_LIMIT 7
+#define SERVER_QUEUE_LIMIT 5
 
 void error_and_quit(const char* err){
   perror(err);
