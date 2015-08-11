@@ -10,6 +10,7 @@
 
    Current content includes:
                      - message buffer size
+		     - file name padding character
 
  */
 
@@ -17,5 +18,6 @@
 #define _SERVERCLIENTCOMMON_H
 
 #define BUFFER_SIZE 2048
+#define PADDING_CHAR '#'
 
 #endif /* _SERVERCLIENTCOMMON_H */

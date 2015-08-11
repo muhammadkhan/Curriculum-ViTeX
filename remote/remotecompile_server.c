@@ -27,6 +27,7 @@
 #include "serverclientcommon.h"
 
 #define SERVER_QUEUE_LIMIT 5
+#define DUMP_BASE_DIR "temp/"
 
 void error_and_quit(const char* err){
   perror(err);
@@ -46,7 +47,25 @@ struct tex_blob {
 };
 
 int write_dump(const char* data_dump){
-  
+  if(data_dump == NULL){
+    perror("dat null dump");
+    return -1;
+  }
+  struct tex_blob* dump;
+  char* unpadded_fname, *iter, *full_fname;
+  FILE* f;
+  unpadded_fname = "";
+  dump = (struct tex_blob*)data_dump;
+  for(iter = dump->padded_fname; *iter != PADDING_CHAR; ++iter)
+    strncat(unpadded_fname, iter, 1); //write byte-by-byte
+  full_fname = DUMP_BASE_DIR;
+  strcat(full_fname, unpadded_fname);
+  f = fopen(full_fname, "w");
+  if(f == NULL){
+    perror("Could not save incoming file to server space");
+    return -1;
+  }
+  fprintf(f, dump->file_data);
 }
 
 int main(int argc, char** argv) {
