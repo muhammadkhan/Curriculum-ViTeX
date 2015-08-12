@@ -11,6 +11,7 @@
    Current content includes:
                      - message buffer size
 		     - file name padding character
+		     - a struct describing the packet protocol
 
  */
 
@@ -19,5 +20,10 @@
 
 #define BUFFER_SIZE 2048
 #define PADDING_CHAR '#'
+
+struct blob{
+  char padded_fname[BUFFER_SIZE];
+  char* file_data;
+};
 
 #endif /* _SERVERCLIENTCOMMON_H */

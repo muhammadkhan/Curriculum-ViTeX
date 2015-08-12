@@ -25,14 +25,11 @@
 #include <sys/socket.h>
 
 #include "serverclientcommon.h"
+#include "utils.h"
 
 #define SERVER_QUEUE_LIMIT 5
-#define DUMP_BASE_DIR "temp/"
-
-void error_and_quit(const char* err){
-  perror(err);
-  exit(1);
-}
+#define DUMP_BASE_DIR "tmp/cvitex/"
+#define PDF_EXTENSION ".pdf"
 
 void socket_init(struct sockaddr_in* sock, unsigned short port){
   memset(sock, 0, sizeof(*sock));
@@ -41,31 +38,32 @@ void socket_init(struct sockaddr_in* sock, unsigned short port){
   sock->sin_port = htons(port);
 }
 
-struct tex_blob {
-  char padded_fname[BUFFER_SIZE];
-  char* file_data;
-};
-
-int write_dump(const char* data_dump){
-  struct tex_blob* dump;
-  char* unpadded_fname, *iter, *full_fname;
+FILE* write_and_compile_dump(const char* data_dump, int* err_code){
+  struct blob* tex_blob;
+  char* unpadded_fname, *iter, *full_fname, *pdflatex;
   FILE* f;
   if(data_dump == NULL){
     perror("dat null dump");
-    return -1;
+    *err_code = -1;
+    return NULL;
   }
   unpadded_fname = "";
-  dump = (struct tex_blob*)data_dump;
-  for(iter = dump->padded_fname; *iter != PADDING_CHAR; ++iter)
+  tex_blob = (struct blob*)data_dump;
+  for(iter = tex_blob->padded_fname; *iter != PADDING_CHAR; ++iter)
     strncat(unpadded_fname, iter, 1); //write byte-by-byte
   full_fname = DUMP_BASE_DIR;
   strcat(full_fname, unpadded_fname);
   f = fopen(full_fname, "w");
   if(f == NULL){
     perror("Could not save incoming file to server space");
-    return -1;
+    *err_code = -1;
+    return NULL;
   }
-  fprintf(f, dump->file_data);
+  fprintf(f, tex_blob->file_data);
+  sprintf(pdflatex, "pdflatex %s", full_fname);
+  *err_code = system(pdflatex);
+  str_replace_last(full_fname, PDF_EXTENSION);
+  return fopen(full_fname,"r");
 }
 
 int main(int argc, char** argv) {
@@ -94,13 +92,15 @@ int main(int argc, char** argv) {
 
   /*now we can actually start the main loop */
   while(1){
-    int child_socket_fd, client_length;
+    int child_socket_fd, client_length, compile_exit_status;
     struct sockaddr_in clientaddress;
     struct hostent* client_host_info;
     char* client_host_address;
-    char client_msg_buf[BUFFER_SIZE];
-    int bytes_read;
+    char client_msg_buf[BUFFER_SIZE], pdf_file_buf[BUFFER_SIZE];
+    int bytes_read, total_bytes_sent;
     char* data_dump;
+    FILE* pdf_file;
+    long pdf_file_size;
     client_length = sizeof(clientaddress);
     child_socket_fd = accept(parent_socket_fd,
 			     (struct sockaddr_in*)&clientaddr,
@@ -118,7 +118,7 @@ int main(int argc, char** argv) {
     printf("SERVER HAS ESTABLISHED CONNECTION WITH %s (%s)\n",
 	   client_host_info->h_name,
 	   client_host_address);
-    memset(client_msg_buf, BUFFER_SIZE);
+    memset(client_msg_buf, sizeof(client_msg_buf));
 
     /*
      * One major assumption of this connection is that
@@ -140,8 +140,27 @@ int main(int argc, char** argv) {
     } while(bytes_read == BUFFER_SIZE);
     if(strlen(data_dump) > 0){
       /* now let's actually do something with all this */
-      if(write_dump(data_dump) < 0)
-	error_and_quit("Unable to successfully compile into PDF - aborting");
+      pdf_file = write_and_compile_dump(data_dump, &compile_exit_status);
+      if(pdf_file == NULL){
+	char* err_msg;
+	sprintf(err_msg, "Unable to successfully compile into PDF. Exit status: %d\n", compile_exit_status);
+	error_and_quit(err_msg);
+      }
+      /* now just send the PDF file back to the client */
+      fseek(pdf_file, 0, SEEK_END);
+      pdf_file_size = ftell(pdf_file);
+      rewind(pdf_file);
+      memset(pdf_file_buf, pdf_file_size);
+      bytes_read = fread((void*)pdf_file_buf, pdf_file_size, 1, pdf_file);
+      if(bytes_read != pdf_file_size)
+	error_and_quit("Error reading PDF file bytestream\n");
+      total_bytes_sent = 0;
+      memset(client_msg_buf, sizeof(client_msg_buf));
+      while(total_bytes_sent < pdf_file_size){
+	int bytes_to_send, bytes_sent;
+	bytes_to_send =
+	  (total_bytes_sent + BUFFER_SIZE < pdf_file_size) ? BUFFER_SIZE : pdf_file_size - total_bytes_sent;
+      }
     }
     close(child_socket_fd);
   }
