@@ -22,6 +22,7 @@
 
 #define BUFFER_SIZE 2048
 #define PADDING_CHAR '#'
+#define PDF_EXTENSION ".pdf"
 
 struct blob{
   char padded_fname[BUFFER_SIZE];

@@ -29,12 +29,11 @@
 
 #define SERVER_QUEUE_LIMIT 5
 #define DUMP_BASE_DIR "tmp/cvitex/"
-#define PDF_EXTENSION ".pdf"
 
 void socket_init(struct sockaddr_in* sock, unsigned short port){
   memset(sock, 0, sizeof(*sock));
   sock->sin_family = AF_INET;
-  sock->sin_addr_s_addr = htonl(INADDR_ANY);
+  sock->sin_addr.s_addr = htonl(INADDR_ANY);
   sock->sin_port = htons(port);
 }
 
@@ -84,8 +83,8 @@ int main(int argc, char** argv) {
   optval = 1;
   setsockopt(parent_socket_fd, SQL_SOCKET,
 	     SO_REUSEADDR, (const void*)&optval, sizeof(int));
-  socket_init(&structaddress, (unsigned short)port);
-  if(bind(parent_socket_fd, ()&serveraddress, sizeof(serveraddress)) < 0)
+  socket_init(&serveraddress, (unsigned short)port);
+  if(bind(parent_socket_fd, &serveraddress, sizeof(serveraddress)) < 0)
     error_and_quit("Couldn't bind socket");
   if(listen(parent_socket_fd, SERVER_QUEUE_LIMIT) < 0)
     error_and_quit("Socket unable to begin listening");
@@ -118,7 +117,7 @@ int main(int argc, char** argv) {
     printf("SERVER HAS ESTABLISHED CONNECTION WITH %s (%s)\n",
 	   client_host_info->h_name,
 	   client_host_address);
-    memset(client_msg_buf, sizeof(client_msg_buf));
+    memset(client_msg_buf, sizeof(client_msg_buf));p
 
     /*
      * One major assumption of this connection is that
