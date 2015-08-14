@@ -157,11 +157,15 @@ int main(int argc, char** argv) {
       total_bytes_sent = 0;
       memset(client_msg_buf, sizeof(client_msg_buf));
       while(total_bytes_sent < pdf_file_size){
-	int bytes_to_send, bytes_sent;
-	bytes_to_send =
-	  (total_bytes_sent + BUFFER_SIZE < pdf_file_size) ? BUFFER_SIZE : pdf_file_size - total_bytes_sent;
+	int bytes_sent;
+	bytes_sent = write(child_socket_fd, client_msg_buf,
+			   bytes_to_send(total_bytes_sent,
+					 BUFFER_SIZE,
+					 pdf_file_size));
+	total_bytes_sent += bytes_sent;
       }
     }
+    printf("Finished entire transaction with client @ %d\n", client_socket_fd);
     close(child_socket_fd);
   }
   return 0;
