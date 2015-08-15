@@ -26,13 +26,15 @@
 
 int main(int argc, char** argv){
   int socket_fd, port;
-  char* hostname;
+  char* hostname, texfile_name;
+  FILE* texfile;
   struct sockaddr_in serveraddress;
   struct hostent* server_info;
   if(argc != 4)
     error_and_quit("ERROR - usage: %s <hostname> <port-number> <path/to/tex/file>", argv[0]);
   port = atoi(argv[2]);
   hostname = argv[1];
+  texfile_name = argv[3];
   socket_fd = socket(AF_INET, SOCK_STREAM, 0);
   if(socket_fd < 0){
     char* err_msg;
@@ -54,6 +56,7 @@ int main(int argc, char** argv){
   serveraddress.sin_port = htons(port);
   if(connect(socket_fd, &serveraddress, sizeof(serveraddress)) < 0)
     error_and_quit("Error establishing connection");
-  /* now data transfer actually starts */
-  
+  /* make initial blob */
+  struct blob texblob;
+  memset(texblob.padded_fname, '\0', BUFFER_SIZE);
 }

@@ -40,10 +40,29 @@ struct blob{
  *                         number of bytes that can be sent at one time
  *
  * @param total_bytes_to_send the number of bytes that are to be sent
-                              in total
+ *                            in total
+ *
+ * @return the number of bytes actually sent during this particular
+ *         invocation
  */
 unsigned int bytes_to_send(int total_bytes_sent,
 			   int maximum_sendable,
 			   int total_bytes_to_send);
+
+/**
+ * Creates a 'blob' by passing in the raw file name. Adds padding
+ * and loads the file's data also. Modifies the first argument by
+ * loading it with this information. Returns a negative number in
+ * the case of failure.
+ *
+ * @param blob A pointer to the blob struct to be filled
+ *
+ * @param unpadded_fname the raw (unpadded) file name for which
+ *                       to generate a blob
+ *
+ * @return a negative number in the case of failure, or a non-zero
+ *         number otherwise
+ */
+int blob_generate(struct blob* blob, const char* unpadded_fname);
 
 #endif /* _SERVERCLIENTCOMMON_H */
