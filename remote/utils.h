@@ -47,4 +47,15 @@ void error_and_quit(const char* err);
  */
 char* str_replace_last(char* destination, const char* source);
 
+/**
+ * Takes a (full) file path and returns only that portion
+ * which corresponds to the actual file name, i.e. removes
+ * all the prepending directory names.
+ *
+ * @param fp the full file path to be stripped
+ *
+ * @return simply the file name portion from the supplied path
+ */
+char* strip_extra_dirs(const char* fp);
+
 #endif /* _UTILS_H */

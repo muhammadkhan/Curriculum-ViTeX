@@ -16,6 +16,13 @@
 
 #include "utils.h"
 
+const char path_sep =
+  #ifdef _WIN32
+  '\\';
+  #else
+  '/';
+  #endif
+
 void error_and_quit(const char* err){
   perror(err);
   exit(1);
@@ -34,4 +41,16 @@ char* str_replace_last(char* destination, const char* source){
       destination[i] = source[i]; //replace
   }
   return dest_copy;
+}
+
+char* strip_extra_dirs(const char* fp){
+  char* stripped, *iter;
+  stripped = "";
+  for(iter = fp; *iter != '\0'; ++iter){
+    if(*iter == path_sep)
+      stripped = "";
+    else
+      strncat(stripped, iter, 1);
+  }
+  return stripped;
 }
