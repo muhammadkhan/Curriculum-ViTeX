@@ -100,6 +100,7 @@ int main(int argc, char** argv) {
     char* data_dump;
     FILE* pdf_file;
     long pdf_file_size;
+    char* pdf_file_buf_iter;
     client_length = sizeof(clientaddress);
     child_socket_fd = accept(parent_socket_fd,
 			     (struct sockaddr_in*)&clientaddr,
@@ -155,13 +156,15 @@ int main(int argc, char** argv) {
 	error_and_quit("Error reading PDF file bytestream\n");
       total_bytes_sent = 0;
       memset(client_msg_buf, sizeof(client_msg_buf));
+      pdf_file_buf_iter = pdf_file_buf;
       while(total_bytes_sent < pdf_file_size){
-	int bytes_sent;
-	bytes_sent = write(child_socket_fd, client_msg_buf,
-			   bytes_to_send(total_bytes_sent,
-					 BUFFER_SIZE,
-					 pdf_file_size));
+	int bytes_sent, to_send;
+	to_send = bytes_to_send(total_bytes_sent,
+				BUFFER_SIZE,
+				pdf_file_size);
+	bytes_sent = write(child_socket_fd, pdf_file_buf_iter, to_send);
 	total_bytes_sent += bytes_sent;
+	pdf_file_buf_iter += bytes_sent;
       }
     }
     printf("Finished entire transaction with client @ %d\n", client_socket_fd);
