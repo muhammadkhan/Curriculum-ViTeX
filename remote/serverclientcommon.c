@@ -26,6 +26,8 @@ int blob_generate(struct blob* blob, const char* unpadded_fname){
   char* unpadded_stripped;
   long f_size;
   unpadded_stripped = strip_extra_dirs(unpadded_fname);
+  if(unpadded_stripped == NULL)
+    return -1;
   memset(blob->padded_fname, '\0', BUFFER_SIZE);
   for(i = 0; i < BUFFER_SIZE; i++){
     if(i < strlen(unpadded_fname))
@@ -38,4 +40,5 @@ int blob_generate(struct blob* blob, const char* unpadded_fname){
   f_size = ftell(f);
   rewind(f);
   fgets(blob->file_data, (int)f_size, f);
+  return 0;
 }
