@@ -1,5 +1,5 @@
 CC=gcc
-COMMON_SRC = utils.c
+COMMON_SRC = utils.c serverclientcommon.c
 SERVER_SRC = remotecompile_server.c
 CLIENT_SRC = remotecompile_client.c
 
