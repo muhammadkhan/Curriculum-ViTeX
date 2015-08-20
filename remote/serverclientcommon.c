@@ -10,6 +10,7 @@
 
  */
 #include <math.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "serverclientcommon.h"
@@ -17,7 +18,9 @@
 
 unsigned int bytes_to_send(int tbs, int max, int tb2s){
   int diff = tb2s - tbs;
-  return fmin(diff, max);
+  if(diff < max)
+    return diff;
+  return max;
 }
 
 int blob_generate(struct blob* blob, const char* unpadded_fname){

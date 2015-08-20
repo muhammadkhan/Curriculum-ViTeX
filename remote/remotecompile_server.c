@@ -21,7 +21,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <arpa/inet.h>
+#include <netinet/in.h>
 #include <sys/socket.h>
 
 #include "serverclientcommon.h"
@@ -67,7 +69,7 @@ FILE* write_and_compile_dump(const char* data_dump, int* err_code){
 }
 
 int main(int argc, char** argv) {
-  int parent_socket_fd;
+  int parent_socket_fd, port;
   int optval;
   struct sockaddr_in serveraddress;
   //check if port number was supplied
@@ -81,11 +83,11 @@ int main(int argc, char** argv) {
       socket_error_msg = "Problem opening socket on specified port";
     error_and_quit(socket_error_msg);
   }
-  optval = 1;
+  /*  optval = 1;
   setsockopt(parent_socket_fd, SQL_SOCKET,
-	     SO_REUSEADDR, (const void*)&optval, sizeof(int));
+  SO_REUSEADDR, (const void*)&optval, sizeof(int)); */
   socket_init(&serveraddress, (unsigned short)port);
-  if(bind(parent_socket_fd, &serveraddress, sizeof(serveraddress)) < 0)
+  if(bind(parent_socket_fd, (struct sockaddr*)&serveraddress, sizeof(serveraddress)) < 0)
     error_and_quit("Couldn't bind socket");
   if(listen(parent_socket_fd, SERVER_QUEUE_LIMIT) < 0)
     error_and_quit("Socket unable to begin listening");
@@ -104,7 +106,7 @@ int main(int argc, char** argv) {
     char* pdf_file_buf_iter;
     client_length = sizeof(clientaddress);
     child_socket_fd = accept(parent_socket_fd,
-			     (struct sockaddr_in*)&clientaddr,
+			     (struct sockaddr*)&clientaddress,
 			     &client_length);
     if(child_socket_fd < 0)
       error_and_quit("Server unable to accept connection from client");
@@ -119,7 +121,7 @@ int main(int argc, char** argv) {
     printf("SERVER HAS ESTABLISHED CONNECTION WITH %s (%s)\n",
 	   client_host_info->h_name,
 	   client_host_address);
-    memset(client_msg_buf, sizeof(client_msg_buf));p
+    memset(client_msg_buf, '\0', sizeof(client_msg_buf));
 
     /*
      * One major assumption of this connection is that
@@ -151,12 +153,12 @@ int main(int argc, char** argv) {
       fseek(pdf_file, 0, SEEK_END);
       pdf_file_size = ftell(pdf_file);
       rewind(pdf_file);
-      memset(pdf_file_buf, pdf_file_size);
+      memset(pdf_file_buf, '\0', pdf_file_size);
       bytes_read = fread((void*)pdf_file_buf, pdf_file_size, 1, pdf_file);
       if(bytes_read != pdf_file_size)
 	error_and_quit("Error reading PDF file bytestream\n");
       total_bytes_sent = 0;
-      memset(client_msg_buf, sizeof(client_msg_buf));
+      memset(client_msg_buf, '\0', sizeof(client_msg_buf));
       pdf_file_buf_iter = pdf_file_buf;
       while(total_bytes_sent < pdf_file_size){
 	int bytes_sent, to_send;
@@ -168,7 +170,7 @@ int main(int argc, char** argv) {
 	pdf_file_buf_iter += bytes_sent;
       }
     }
-    printf("Finished entire transaction with client @ %d\n", client_socket_fd);
+    printf("Finished entire transaction with client @ %d\n", child_socket_fd);
     close(child_socket_fd);
   }
   return 0;

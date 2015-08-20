@@ -44,7 +44,8 @@ char* str_replace_last(char* destination, const char* source){
 }
 
 char* strip_extra_dirs(const char* fp){
-  char* stripped, *iter;
+  char* stripped;
+  const char* iter;
   stripped = "";
   for(iter = fp; *iter != '\0'; ++iter){
     if(*iter == path_sep)
