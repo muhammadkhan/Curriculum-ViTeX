@@ -27,7 +27,7 @@
 int main(int argc, char** argv){
   int socket_fd, port;
   char* hostname, texfile_name;
-  FILE* texfile;
+  FILE* texfile, pdffile;
   struct sockaddr_in serveraddress;
   struct hostent* server_info;
   struct blob texblob, *pdfblob;
@@ -88,4 +88,12 @@ int main(int argc, char** argv){
   if(strlen(pdf_dump) <= 0)
     error_and_quit("CLIENT: There was an error reading back the PDF\n");
   pdfblob = (struct blob*)pdf_dump;
+  pdffile = fopen(unpad(pdfblob->padded_fname), "w");
+  if(pdffile == NULL)
+    error_and_quit("CLIENT: Couldn't create appropriate PDF filename from server");
+  fwrite(pdf_dump, sizeof(char), pdf_bytes_read, pdffile);
+  printf("Successful receipt of PDF from server to client!\n");
+  fclose(pdffile);
+  close(socket_fd);
+  return 0;
 }
