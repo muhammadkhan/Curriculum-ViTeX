@@ -14,6 +14,7 @@
 		     - a struct describing the packet protocol
 		     - a function that decides the appropriate amount
 		       of expected bytes to send
+		     - routines to pad/unpad
 
  */
 
@@ -64,5 +65,31 @@ unsigned int bytes_to_send(int total_bytes_sent,
  *         number otherwise
  */
 int blob_generate(struct blob* blob, const char* unpadded_fname);
+
+/**
+ * Returns a new padded version of the input string of
+ * length 'BUFFER_SIZE', with
+ * 'PADDING_CHAR' used for the padding
+ *
+ * @param unpadded the original string to be padded
+ *
+ * @return a separate string of length 'BUFFER_SIZE' with
+ *         a padded tail of 'PADDING_CHAR' characters
+ */
+char* pad(char* unpadded);
+
+/**
+ * Returns a new string that has been stripped of all padding.
+ * Throws an error if the input string is not of length
+ * 'BUFFER_SIZE'.
+ *
+ * @param padded a string of length 'BUFFER_SIZE' expected to
+ *               have a trail of 'PADDING_CHAR' characters at its
+ *               tail
+ *
+ * @return a string stripped of the padding, or throws an error if
+ *         the inut was not of appropriate size
+ */
+char* unpad(char* padded);
 
 #endif /* _SERVERCLIENTCOMMON_H */

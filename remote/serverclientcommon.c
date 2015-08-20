@@ -42,3 +42,30 @@ int blob_generate(struct blob* blob, const char* unpadded_fname){
   fgets(blob->file_data, (int)f_size, f);
   return 0;
 }
+
+char* pad(char* unpadded){
+  char* padded;
+  int unpadded_len, i;
+  unpadded_len = strlen(unpadded);
+  if(unpadded_len > BUFFER_SIZE)
+    error_and_quit("Filename is too long to pad");
+  memset(padded, '\0', BUFFER_SIZE);
+  for(i = 0; i < BUFFER_SIZE; i++){
+    if(i < unpadded_len)
+      padded[i] = unpadded[i];
+    else
+      padded[i] = PADDING_CHAR;
+  }
+  return padded;
+}
+
+char* unpad(char* padded){
+  if(strlen(padded) != BUFFER_SIZE)
+    error_and_quit("String to unpad is not of proper size");
+  char* unpadded, *iter;
+  unpadded = "";
+  for(iter = padded; *iter != PADDING_CHAR; ++iter){
+    strncat(unpadded, iter, 1);
+  }
+  return unpadded;
+}
