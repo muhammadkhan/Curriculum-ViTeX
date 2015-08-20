@@ -46,10 +46,11 @@ FILE* write_and_compile_dump(const char* data_dump, int* err_code){
     *err_code = -1;
     return NULL;
   }
-  unpadded_fname = "";
+  /*unpadded_fname = "";
   tex_blob = (struct blob*)data_dump;
   for(iter = tex_blob->padded_fname; *iter != PADDING_CHAR; ++iter)
-    strncat(unpadded_fname, iter, 1); //write byte-by-byte
+  strncat(unpadded_fname, iter, 1); //write byte-by-byte*/
+  unpadded_fname = unpad(tex_blob->padded_fname);
   full_fname = DUMP_BASE_DIR;
   strcat(full_fname, unpadded_fname);
   f = fopen(full_fname, "w");
