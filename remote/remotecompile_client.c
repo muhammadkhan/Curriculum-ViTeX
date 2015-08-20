@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
 
@@ -26,16 +27,19 @@
 
 int main(int argc, char** argv){
   int socket_fd, port;
-  char* hostname, texfile_name;
-  FILE* texfile, pdffile;
+  char* hostname, *texfile_name;
+  FILE* texfile, *pdffile;
   struct sockaddr_in serveraddress;
   struct hostent* server_info;
   struct blob texblob, *pdfblob;
   char* bytewise_blob, *pdf_dump;
   char pdf_buffer[BUFFER_SIZE];
   int total_bytes_tex_sent, pdf_bytes_read;
-  if(argc != 4)
-    error_and_quit("ERROR - usage: %s <hostname> <port-number> <path/to/tex/file>", argv[0]);
+  if(argc != 4){
+    char* msg;
+    sprintf(msg, "ERROR - usage: %s <hostname> <port-number> <path/to/tex/file>", argv[0]);
+    error_and_quit(msg);
+  }
   port = atoi(argv[2]);
   hostname = argv[1];
   texfile_name = argv[3];
@@ -58,11 +62,11 @@ int main(int argc, char** argv){
   memmove((char*)&serveraddress.sin_addr.s_addr,
 	  server_info->h_addr, server_info->h_length);
   serveraddress.sin_port = htons(port);
-  if(connect(socket_fd, &serveraddress, sizeof(serveraddress)) < 0)
+  if(connect(socket_fd, (struct sockaddr*)&serveraddress, sizeof(serveraddress)) < 0)
     error_and_quit("Error establishing connection");
   /* make initial blob */
-  blob_generate(texblob, texfile_name);
-  bytewise_blob = (char*)texblob;
+  blob_generate(&texblob, texfile_name);
+  bytewise_blob = (char*)&texblob;
   total_bytes_tex_sent = 0;
   while(total_bytes_tex_sent < sizeof(texblob.file_data)){
     int bytes_sent, to_send;
